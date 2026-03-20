@@ -1,0 +1,169 @@
+<!doctype html>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GameReview - Catálogo Dinámico</title>
+    <!-- Carga Tailwind para las clases base y utilidades como flex, grid, etc. -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Importa tus estilos CSS personalizados -->
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Define la fuente Inter globalmente */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0d0e1b; /* Un fondo muy oscuro para que todo resalte */
+            color: #ad0dd4;
+        }
+        /* Estilos de tu barra de navegación y secciones estáticas (asegúrate de que están en styles.css) */
+        .navbar { background-color: #1a1a2e; padding: 1rem 0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.2); }
+        .nav-container { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; padding: 0 1rem; }
+        .logo { font-size: 1.8rem; font-weight: bold; color: #9f7aea; }
+        .nav-menu { display: flex; list-style: none; margin: 0; padding: 0; }
+        .nav-menu li a { color: #e2e8f0; padding: 0.5rem 1rem; transition: color 0.3s; }
+        .nav-menu li a:hover { color: #9f7aea; }
+        .nav-right { display: flex; align-items: center; gap: 1rem; }
+        .search-input { padding: 0.5rem; border-radius: 0.5rem; border: 1px solid #3f3d56; background-color: #2b2c49; color: #e2e8f0; }
+        .register-btn { background-color: #9f7aea; color: white; padding: 0.5rem 1rem; border-radius: 0.5rem; font-weight: bold; }
+        .profile-img { border-radius: 50%; border: 2px solid #9f7aea; }
+
+        .hero { 
+            background-size: cover; 
+            background-position: center; 
+            height: 400px; 
+            display: flex; 
+            align-items: center; 
+            padding: 0 4rem; 
+            border-radius: 1rem;
+        }
+        .hero-content h1 { font-size: 2.5rem; font-weight: bold; margin-bottom: 0.5rem; }
+        .hero-content p { max-width: 600px; margin-bottom: 1.5rem; }
+        .rating { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem; }
+        .stars { color: gold; font-size: 1.2rem; }
+        .score { font-size: 1.1rem; font-weight: bold; background-color: #9f7aea; padding: 0.2rem 0.6rem; border-radius: 0.5rem; }
+        .btn-primary { background-color: #9f7aea; color: white; padding: 0.75rem 1.5rem; border-radius: 0.5rem; font-weight: bold; transition: background-color 0.3s; }
+        .btn-primary:hover { background-color: #805ad5; }
+        
+        .section-header { display: flex; justify-content: space-between; align-items: center; }
+        
+    </style>
+</head>
+<body>
+    <header class="navbar">
+        <div class="nav-container">
+            <div class="logo">GameReviews</div>
+            <ul class="nav-menu">
+                <li><a href="index.html">Inicio</a></li>
+                <li><a href="catalogo.html">Juegos</a></li>
+                <li><a href="resenas.html">Reseñas</a></li>
+            </ul>
+            <div class="nav-right">
+                <input class="search-input" type="search" placeholder="Buscar...">
+                <a class="register-btn" href="#">Iniciar sesión</a>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <section class="hero" style="background-image: linear-gradient(180deg, rgba(0,0,0,0.3), rgba(0,0,0,0.6));">
+            <div class="hero-content">
+                <h1>Crear cuenta</h1>
+                <p>Únete a la comunidad para valorar y comentar tus juegos favoritos.</p>
+            </div>
+        </section>
+
+        <section>
+            <div class="api-game-card" style="max-width:720px;margin:0 auto;padding:1.5rem;">
+                <h2>Registro de usuario</h2>
+
+                <form id="registerForm" action="#" method="post" enctype="multipart/form-data" novalidate>
+                    <div style="display:grid;gap:0.75rem;margin-top:1rem;">
+                        <label class="details-text" for="username">Nombre de usuario</label>
+                        <input id="username" name="username" class="search-input" type="text" required placeholder="Tu nickname">
+
+                        <label class="details-text" for="email">Correo electrónico</label>
+                        <input id="email" name="email" class="search-input" type="email" required placeholder="usuario@ejemplo.com">
+
+                        <label class="details-text" for="password">Contraseña</label>
+                        <div style="display:flex;gap:0.5rem;align-items:center;">
+                            <input id="password" name="password" class="search-input" type="password" required placeholder="********">
+                            <button type="button" id="togglePwd" class="btn-secondary" style="height:40px;">Mostrar</button>
+                        </div>
+
+                        <label class="details-text" for="confirm">Confirmar contraseña</label>
+                        <input id="confirm" name="confirm" class="search-input" type="password" required placeholder="Repite la contraseña">
+
+                        <label class="details-text" for="avatar">Avatar (opcional)</label>
+                        <input id="avatar" name="avatar" class="search-input" type="file" accept="image/*">
+
+                        <label style="display:flex;gap:0.5rem;align-items:center;margin-top:0.25rem;">
+                            <input id="terms" name="terms" type="checkbox" required>
+                            <span class="details-text">Acepto los términos y condiciones</span>
+                        </label>
+
+                        <div id="errorMsg" style="color:#f87171;font-weight:600;min-height:1.2rem;"></div>
+
+                        <div style="display:flex;gap:0.5rem;margin-top:0.5rem;">
+                            <button type="submit" class="btn-primary" style="flex:1;">Crear cuenta</button>
+                            <a href="#" class="btn-secondary" style="align-self:center;padding:0.5rem 1rem;">Cancelar</a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-brand">
+                <div class="logo">GameReviews</div>
+                <div style="color:#9ca3af;">Comparte y descubre reseñas honestas.</div>
+            </div>
+            <div class="footer-links">
+                <ul>
+                    <li>Contacto</li>
+                    <li>Privacidad</li>
+                    <li>Soporte</li>
+                </ul>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+    // Simple client-side checks: mostrar contraseña y validar match
+    const toggle = document.getElementById('togglePwd');
+    const pwd = document.getElementById('password');
+    const confirm = document.getElementById('confirm');
+    const form = document.getElementById('registerForm');
+    const err = document.getElementById('errorMsg');
+
+    toggle.addEventListener('click', () => {
+        const t = pwd.type === 'password' ? 'text' : 'password';
+        pwd.type = t;
+        confirm.type = t;
+        toggle.textContent = t === 'text' ? 'Ocultar' : 'Mostrar';
+    });
+
+    form.addEventListener('submit', (e) => {
+        e.preventDefault(); // evitar envío nativo; gestionamos la navegación aquí
+        err.textContent = '';
+        if (pwd.value.length < 6) {
+            err.textContent = 'La contraseña debe tener al menos 6 caracteres.';
+            return;
+        }
+        if (pwd.value !== confirm.value) {
+            err.textContent = 'Las contraseñas no coinciden.';
+            return;
+        }
+        if (!document.getElementById('terms').checked) {
+            err.textContent = 'Debes aceptar los términos.';
+            return;
+        }
+        // Validación OK -> redirigir a index.html
+        window.location.href = 'index.html';
+    });
+</script>
+</body>
+</html>

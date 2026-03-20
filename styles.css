@@ -1,0 +1,479 @@
+/* -------------------------------------------------------------------------- */
+/* ESTILOS BASE                                */
+/* -------------------------------------------------------------------------- */
+
+:root {
+    --color-primary: #4f46e5; /* Índigo */
+    --color-secondary: #10b981; /* Verde esmeralda */
+    --color-background-dark: #121212; /* Fondo muy oscuro */
+    --color-card-dark: #1f1f1f; /* Fondo de tarjeta oscuro */
+    --color-text-light: #e0e0e0; /* Texto claro */
+}
+
+/* Aplica el modo oscuro y la fuente Inter globalmente */
+body {
+    background-color: var(--color-background-dark);
+    color: var(--color-text-light);
+    font-family: 'Inter', sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+/* Estilos de encabezados y enlaces */
+h1, h2, h3 {
+    color: var(--color-text-light);
+    font-weight: 800; /* Extra bold */
+}
+
+a {
+    color: var(--color-text-light);
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+a:hover {
+    color: var(--color-primary);
+}
+
+
+/* -------------------------------------------------------------------------- */
+/* HEADER / NAVAR                             */
+/* -------------------------------------------------------------------------- */
+
+.navbar {
+    background-color: rgba(31, 31, 31, 0.95); /* Fondo semitransparente oscuro */
+    backdrop-filter: blur(10px); /* Efecto de desenfoque */
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    padding: 1rem 2rem;
+}
+
+.nav-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo {
+    font-size: 1.8rem;
+    font-weight: 900;
+    color: var(--color-primary);
+}
+
+.nav-menu {
+    display: flex;
+    list-style: none;
+    gap: 1.5rem;
+    margin: 0;
+    padding: 0;
+}
+
+.nav-right {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.search-input {
+    padding: 0.5rem;
+    border: 1px solid #444;
+    border-radius: 6px;
+    background-color: #2a2a2a;
+    color: var(--color-text-light);
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.search-input:focus {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.5);
+    outline: none;
+}
+
+.register-btn {
+    background-color: var(--color-primary);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-weight: 600;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+.register-btn:hover {
+    background-color: #6366f1; /* Tono más claro */
+    transform: translateY(-1px);
+}
+
+.profile-img {
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    object-fit: cover;
+    border: 2px solid var(--color-primary);
+}
+
+/* -------------------------------------------------------------------------- */
+/* HERO SECTION                               */
+/* -------------------------------------------------------------------------- */
+
+.hero {
+    height: 500px; /* Altura de la sección */
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    margin-bottom: 2rem;
+    border-radius: 12px;
+}
+
+.hero-content {
+    color: white;
+    max-width: 800px;
+    padding: 2rem;
+}
+
+.hero-content h1 {
+    font-size: 3.5rem;
+    margin-bottom: 0.5rem;
+    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8);
+    color: white;
+}
+
+.hero-content p {
+    font-size: 1.2rem;
+    margin-bottom: 1.5rem;
+    text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.6);
+}
+
+.rating {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.stars {
+    color: gold;
+    font-size: 1.5rem;
+}
+
+.score {
+    background-color: var(--color-secondary);
+    padding: 0.25rem 0.75rem;
+    border-radius: 4px;
+    font-weight: 700;
+    color: #121212;
+}
+
+.btn-primary {
+    background-color: var(--color-primary);
+    color: white;
+    padding: 0.75rem 2rem;
+    border-radius: 8px;
+    font-weight: 700;
+    text-transform: uppercase;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+.btn-primary:hover {
+    background-color: #6366f1;
+    transform: translateY(-2px);
+}
+
+/* -------------------------------------------------------------------------- */
+/* SECCIONES GENERALES                             */
+/* -------------------------------------------------------------------------- */
+
+main {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem 0;
+}
+
+section {
+    padding: 2rem 0;
+    border-bottom: 1px solid #333;
+    margin-bottom: 2rem;
+}
+
+section h2 {
+    font-size: 2.5rem;
+    margin-bottom: 1.5rem;
+    border-left: 5px solid var(--color-primary);
+    padding-left: 1rem;
+}
+
+/* -------------------------------------------------------------------------- */
+/* REVIEW CARDS                                */
+/* -------------------------------------------------------------------------- */
+
+.review-cards {
+    display: flex;
+    gap: 2rem;
+    overflow-x: auto;
+    padding-bottom: 1rem;
+}
+
+.review-card {
+    flex: 0 0 350px; /* Tamaño fijo para scroll horizontal */
+    background-color: var(--color-card-dark);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+    transition: transform 0.3s;
+}
+
+.review-card:hover {
+    transform: translateY(-5px);
+}
+
+.review-card img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+}
+
+.review-content {
+    padding: 1.5rem;
+}
+
+.review-content h3 {
+    font-size: 1.5rem;
+    color: var(--color-primary);
+    margin-bottom: 0.5rem;
+}
+
+.btn-secondary {
+    background-color: var(--color-secondary);
+    color: var(--color-background-dark);
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-weight: 600;
+    margin-top: 1rem;
+    transition: background-color 0.3s;
+}
+
+.btn-secondary:hover {
+    background-color: #14cd94;
+}
+
+/* -------------------------------------------------------------------------- */
+/* POPULAR GAMES GRID                             */
+/* -------------------------------------------------------------------------- */
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.section-header h2 {
+    /* Mantiene el estilo general de h2 */
+    margin-bottom: 0; 
+}
+
+.games-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 2rem;
+}
+
+.game-card {
+    position: relative;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+    transition: transform 0.3s;
+}
+
+.game-card:hover {
+    transform: scale(1.05);
+}
+
+.game-card img {
+    width: 100%;
+    height: 300px;
+    object-fit: cover;
+    display: block;
+}
+
+.game-card .rating {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background-color: var(--color-primary);
+    color: white;
+    padding: 0.4rem 0.8rem;
+    border-radius: 6px;
+    font-weight: 700;
+    font-size: 1rem;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+}
+
+/* -------------------------------------------------------------------------- */
+/* TARJETAS DE LA API (DINÁMICAS) - Nuevo estilo CSS personalizado */
+/* -------------------------------------------------------------------------- */
+
+.api-game-card {
+    background-color: #0c0b0b; /* Simula bg-gray-900 */
+    border-radius: 0.75rem; /* Simula rounded-xl */
+    box-shadow: 0 20px 25px -5px rgba(14, 13, 13, 0.4), 0 8px 10px -6px rgba(0, 0, 0, 0.4); /* Simula shadow-2xl */
+    overflow: hidden;
+    /* Transiciones y transformaciones */
+    transition: transform 0.5s ease;
+    border: 1px solid #374151; /* Simula border-gray-700 */
+}
+
+.api-game-card:hover {
+    transform: scale(1.02); /* Simula hover:scale-[1.02] */
+}
+
+.api-game-card h2 {
+    color: #818cf8; /* Simula text-indigo-400 */
+    font-size: 1.5rem; /* 2xl */
+    font-weight: 800; /* extabold */
+}
+
+.api-game-card .details-text {
+    color: #9ca3af; /* Simula text-gray-400 */
+    font-size: 0.875rem; /* sm */
+}
+
+.api-game-card .description-text {
+    color: #d1d5db; /* Simula text-gray-300 */
+}
+
+.api-game-card .resena-subtitle {
+    color: #d1d5db; /* Simula text-gray-300 */
+    font-weight: 600;
+    font-size: 1.125rem; /* lg */
+    border-bottom: 1px solid #374151; /* Simula border-gray-700 */
+    padding-bottom: 0.25rem;
+}
+
+.api-game-card .resena-item {
+    background-color: #374151; /* Simula bg-gray-700 */
+    border-radius: 0.5rem; /* Simula rounded-lg */
+    padding: 0.5rem;
+    margin-bottom: 0.25rem;
+    color: #e5e7eb; /* Simula text-gray-200 */
+    font-size: 0.875rem; /* sm */
+}
+
+.api-game-card .score-yellow {
+    color: #facc15; /* Simula text-yellow-400 */
+    font-weight: 600;
+}
+
+
+/* -------------------------------------------------------------------------- */
+/* FOOTER                                   */
+/* -------------------------------------------------------------------------- */
+
+footer {
+    background-color: #0d0d0d;
+    padding: 3rem 2rem;
+    border-top: 1px solid #333;
+}
+
+.footer-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.footer-brand {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.social-links {
+    display: flex;
+    gap: 1rem;
+}
+
+.social-links img {
+    width: 24px;
+    height: 24px;
+    filter: invert(1); /* Para que los iconos se vean blancos sobre fondo oscuro */
+    transition: transform 0.2s;
+}
+
+.social-links img:hover {
+    transform: scale(1.1);
+}
+
+.footer-links ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    line-height: 2;
+}
+
+.footer-links li {
+    font-size: 0.9rem;
+    color: #a0a0a0;
+    cursor: pointer;
+}
+
+.footer-links li:hover {
+    color: var(--color-primary);
+}
+
+/* -------------------------------------------------------------------------- */
+/* RESPONSIVE CSS                              */
+/* -------------------------------------------------------------------------- */
+
+@media (max-width: 1024px) {
+    .nav-menu {
+        gap: 1rem;
+    }
+    .hero-content h1 {
+        font-size: 2.5rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .nav-container {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    .nav-menu {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+    .nav-right {
+        width: 100%;
+        justify-content: center;
+    }
+    .search-input {
+        flex-grow: 1;
+    }
+    .hero {
+        height: 400px;
+    }
+    .hero-content h1 {
+        font-size: 2rem;
+    }
+    .review-cards {
+        flex-direction: column;
+    }
+    .review-card {
+        flex: 0 0 auto;
+        width: 100%;
+    }
+    .footer-content {
+        flex-direction: column;
+        gap: 2rem;
+    }
+}

@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GameReview - Catálogo Dinámico</title>
+    <!-- Carga Tailwind para las clases base y utilidades como flex, grid, etc. -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Importa tus estilos CSS personalizados -->
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Define la fuente Inter globalmente */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0d0e1b; /* Un fondo muy oscuro para que todo resalte */
+            color: #ad0dd4;
+        }
+        /* Estilos de tu barra de navegación y secciones estáticas (asegúrate de que están en styles.css) */
+        .navbar { background-color: #1a1a2e; padding: 1rem 0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.2); }
+        .nav-container { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; padding: 0 1rem; }
+        .logo { font-size: 1.8rem; font-weight: bold; color: #9f7aea; }
+        .nav-menu { display: flex; list-style: none; margin: 0; padding: 0; }
+        .nav-menu li a { color: #e2e8f0; padding: 0.5rem 1rem; transition: color 0.3s; }
+        .nav-menu li a:hover { color: #9f7aea; }
+        .nav-right { display: flex; align-items: center; gap: 1rem; }
+        .search-input { padding: 0.5rem; border-radius: 0.5rem; border: 1px solid #3f3d56; background-color: #2b2c49; color: #e2e8f0; }
+        .register-btn { background-color: #9f7aea; color: white; padding: 0.5rem 1rem; border-radius: 0.5rem; font-weight: bold; }
+        .profile-img { border-radius: 50%; border: 2px solid #9f7aea; }
+
+        .hero { 
+            background-size: cover; 
+            background-position: center; 
+            height: 400px; 
+            display: flex; 
+            align-items: center; 
+            padding: 0 4rem; 
+            border-radius: 1rem;
+        }
+        .hero-content h1 { font-size: 2.5rem; font-weight: bold; margin-bottom: 0.5rem; }
+        .hero-content p { max-width: 600px; margin-bottom: 1.5rem; }
+        .rating { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem; }
+        .stars { color: gold; font-size: 1.2rem; }
+        .score { font-size: 1.1rem; font-weight: bold; background-color: #9f7aea; padding: 0.2rem 0.6rem; border-radius: 0.5rem; }
+        .btn-primary { background-color: #9f7aea; color: white; padding: 0.75rem 1.5rem; border-radius: 0.5rem; font-weight: bold; transition: background-color 0.3s; }
+        .btn-primary:hover { background-color: #805ad5; }
+        
+        .section-header { display: flex; justify-content: space-between; align-items: center; }
+        
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <div class="nav-container">
+                <a href="/" class="logo">GameReview</a>
+                <ul class="nav-menu">
+                    <li><a href="catalogo.html">Juegos</a></li>
+                    <li><a href="resenas.html">Reseñas</a></li>
+                    <li><a href="#">Noticias</a></li>
+                    <li><a href="#">Comunidad</a></li>
+                </ul>
+                <div class="nav-right">
+                    <input type="search" placeholder="Search..." class="search-input">
+                    <button class="register-btn"> <a href="registro.html">Registrarse</a></button>
+                    <!-- Usamos un placeholder simple -->
+                    <img src="https://placehold.co/20x20/aaaaaa/000000?text=P" alt="Profile" class="profile-img" width="20" height="20"> 
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container mx-auto p-4 md:p-8">
+        <!-- Hero Section -->
+        <section class="hero mb-16" style="background-image: linear-gradient(to bottom, rgba(0,0,0,0.4), rgba(0,0,0,0.8)), url('https://placehold.co/1200x400/1e293b/ffffff?text=Elden+Ring+DLC');">
+            <div class="hero-content">
+                <h1>Elden Ring: Shadow of the Erdtree</h1>
+                <div class="rating">
+                    <span class="stars">★★★★★</span>
+                    <span class="score">9.5/10</span>
+                </div>
+                <p>La expansión más esperada del año llega con nuevas armas, enemigos y un perfectamente diseñado mundo...</p>
+                <button class="btn-primary"><a href="resenas.html"> Ver Reseñas  </a></button>
+            </div>
+        </section>
+
+        <!-- 🏆 SECCIÓN DINÁMICA 1: JUEGOS MÁS POPULARES  -->
+        <section class="popular-games mb-12">
+            <div class="section-header border-b-2 border-indigo-700/50 pb-4">
+                <!-- Se mantiene el título, pero el contenido es dinámico -->
+                <h2 class="text-3xl font-bold text-white">🥇 Juegos Más Populares (Mejor Calificados)</h2>
+            </div>
+            <!-- ID BUSCADO POR App.js para los destacados (3 mejores) -->
+            <div id="contenedor-populares-dinamico">
+                <!-- Contenido inyectado por App.js -->
+            </div>
+        </section>
+        
+       
+        <section class="mb-12">
+            <h2 class="text-3xl font-bold text-white border-b border-indigo-700 pb-2 mb-4">
+                Catálogo Completo de Juegos
+            </h2>
+            <!-- ID BUSCADO POR App.js para todo el listado -->
+            <div id="contenedor-juegos">
+                <!-- Contenido inyectado por App.js (el resto del catálogo) -->
+            </div>
+        </section>
+
+    </main>
+
+    <footer>
+        <div class="footer-content">
+           <h2> GameReview </h2>
+           <p> © 2024 GameReview. Todos los derechos reservados. </p>
+        
+        </div>
+    </footer>
+    
+    <!-- VINCULAR App.js al final -->
+    <script src="App.js"></script>
+</body>
+</html>

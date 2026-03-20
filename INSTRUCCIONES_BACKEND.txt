@@ -1,0 +1,1264 @@
+================================================================================
+        INSTRUCCIONES Y DOCUMENTACIÓN DEL BACKEND - GAME REVIEWS
+================================================================================
+
+Tecnologías: Java 21, Spring Boot 3.5.7, PostgreSQL 18.0, Maven
+
+================================================================================
+TABLA DE CONTENIDOS
+================================================================================
+1. ¿Qué es este proyecto y cómo funciona?
+2. Estructura del Proyecto
+3. Componentes del Backend (Explicación Técnica y Simplificada)
+4. Base de Datos
+5. Endpoints Disponibles (APIs REST)
+6. Cómo Ejecutar el Proyecto
+7. Cómo Conectar el Frontend al Backend
+8. Solución de Problemas Comunes
+9. Próximos Pasos y Mejoras
+
+================================================================================
+1. ¿QUÉ ES ESTE PROYECTO Y CÓMO FUNCIONA?
+================================================================================
+
+EXPLICACIÓN TÉCNICA:
+-------------------
+Este es un backend REST API desarrollado con Spring Boot que proporciona
+servicios para gestionar un catálogo de videojuegos y sus reseñas. Utiliza
+el patrón arquitectónico MVC (Model-View-Controller), específicamente la
+capa de Modelo y Controlador, delegando la Vista al frontend. Se comunica
+con una base de datos PostgreSQL mediante JPA (Java Persistence API) e
+Hibernate como ORM (Object-Relational Mapping).
+
+EXPLICACIÓN SIMPLE:
+------------------
+Imagina que este backend es como el "cerebro" de la aplicación de reseñas
+de videojuegos. Cuando alguien desde una página web (frontend) quiere ver
+la lista de juegos o escribir una reseña, el frontend le "pregunta" al
+backend. El backend busca esa información en la base de datos PostgreSQL
+y se la devuelve al frontend para que la muestre bonita en pantalla.
+
+Es como un mesero en un restaurante:
+- El cliente (frontend) pide comida
+- El mesero (backend) va a la cocina (base de datos)
+- Trae la comida (datos) al cliente
+
+================================================================================
+2. ESTRUCTURA DEL PROYECTO
+================================================================================
+
+game-reviews-backend/
+│
+├── src/main/java/com/gamereviews/game_reviews_backend/
+│   │
+│   ├── GameReviewsBackendApplication.java    ← Archivo principal que inicia todo
+│   │
+│   ├── model/                                 ← Carpeta de MODELOS (Entidades)
+│   │   ├── Usuario.java                      ← Representa un usuario
+│   │   ├── Juego.java                        ← Representa un videojuego
+│   │   ├── Resena.java                       ← Representa una reseña
+│   │   ├── Estudio.java                      ← Representa un estudio de desarrollo
+│   │   ├── Genero.java                       ← Representa un género de juego
+│   │   └── Plataforma.java                   ← Representa una plataforma (PC, PS5, etc.)
+│   │
+│   ├── repository/                            ← Carpeta de REPOSITORIOS
+│   │   ├── UsuarioRepository.java            ← Operaciones de BD para usuarios
+│   │   ├── JuegoRepository.java              ← Operaciones de BD para juegos
+│   │   ├── ResenaRepository.java             ← Operaciones de BD para reseñas
+│   │   ├── EstudioRepository.java            ← Operaciones de BD para estudios
+│   │   ├── GeneroRepository.java             ← Operaciones de BD para géneros
+│   │   └── PlataformaRepository.java         ← Operaciones de BD para plataformas
+│   │
+│   └── controller/                            ← Carpeta de CONTROLADORES (APIs)
+│       ├── JuegoController.java              ← Endpoints para juegos
+│       ├── ResenaController.java             ← Endpoints para reseñas
+│       ├── CatalogoController.java           ← Endpoints para géneros/plataformas/estudios
+│       └── TestController.java               ← Endpoints de prueba
+│
+├── src/main/resources/
+│   └── application.properties                ← Configuración del proyecto
+│
+├── pom.xml                                   ← Dependencias y configuración de Maven
+│
+└── target/                                   ← Archivos compilados (generados automáticamente)
+
+EXPLICACIÓN SIMPLE DE LAS CARPETAS:
+-----------------------------------
+- model/       → Aquí están las "plantillas" de los datos (Usuario, Juego, etc.)
+- repository/  → Aquí está el código que habla con la base de datos
+- controller/  → Aquí están las "rutas" o URLs que el frontend puede llamar
+
+================================================================================
+3. COMPONENTES DEL BACKEND (Explicación Detallada)
+================================================================================
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│ A. MODELOS (ENTIDADES JPA)                                              │
+└─────────────────────────────────────────────────────────────────────────┘
+
+EXPLICACIÓN TÉCNICA:
+-------------------
+Los modelos son clases Java anotadas con @Entity que representan tablas
+de la base de datos. Utilizan anotaciones JPA (@Table, @Column, @Id, etc.)
+para mapear objetos Java a registros de base de datos. Las relaciones entre
+entidades (@OneToMany, @ManyToOne) reflejan las claves foráneas de la BD.
+Se utiliza Lombok (@Data, @NoArgsConstructor, @AllArgsConstructor) para
+reducir código boilerplate.
+
+EXPLICACIÓN SIMPLE:
+------------------
+Los modelos son como "moldes" o "fichas" que describen cómo se ve cada
+tipo de información. Por ejemplo, el modelo "Juego" dice:
+- Un juego tiene un título
+- Un juego tiene un precio
+- Un juego tiene una fecha de lanzamiento
+- Un juego pertenece a un estudio
+- etc.
+
+Spring Boot toma estos moldes y automáticamente sabe cómo guardar y leer
+esa información de la base de datos PostgreSQL.
+
+ARCHIVOS DE MODELOS:
+-------------------
+
+1. Usuario.java
+   ├── Campos: idUsuario, nombre, correo, contrasenaHash, cantidadResenas
+   ├── Relación: Un usuario puede tener muchas reseñas
+   └── Ubicación: src/main/java/.../model/Usuario.java
+
+2. Juego.java
+   ├── Campos: idJuego, titulo, descripcion, precio, fechaLanzamiento, calificacionProm
+   ├── Relaciones: Pertenece a 1 estudio, 1 género, 1 plataforma; tiene muchas reseñas
+   └── Ubicación: src/main/java/.../model/Juego.java
+
+3. Resena.java
+   ├── Campos: idResena, comentario, puntuacion (1-10), fechaResena
+   ├── Relaciones: Pertenece a 1 usuario y 1 juego
+   └── Ubicación: src/main/java/.../model/Resena.java
+
+4. Estudio.java
+   ├── Campos: idEstudio, nombre
+   ├── Relación: Un estudio puede tener muchos juegos
+   └── Ubicación: src/main/java/.../model/Estudio.java
+
+5. Genero.java
+   ├── Campos: idGenero, nombre
+   ├── Relación: Un género puede tener muchos juegos
+   └── Ubicación: src/main/java/.../model/Genero.java
+
+6. Plataforma.java
+   ├── Campos: idPlataforma, nombre
+   ├── Relación: Una plataforma puede tener muchos juegos
+   └── Ubicación: src/main/java/.../model/Plataforma.java
+
+ANOTACIONES IMPORTANTES USADAS:
+-------------------------------
+@Entity              → Marca la clase como una tabla de base de datos
+@Table(name = "...")  → Especifica el nombre de la tabla en PostgreSQL
+@Id                  → Marca el campo como clave primaria
+@GeneratedValue      → El ID se genera automáticamente (autoincremental)
+@Column              → Especifica propiedades de la columna en la BD
+@ManyToOne           → Relación muchos-a-uno (ej: muchos juegos → 1 estudio)
+@OneToMany           → Relación uno-a-muchos (ej: 1 estudio → muchos juegos)
+@JsonBackReference   → Evita loops infinitos al convertir a JSON
+@JsonManagedReference → Contraparte de JsonBackReference
+@Data                → (Lombok) Genera getters, setters, toString automáticamente
+
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│ B. REPOSITORIOS (ACCESO A DATOS)                                        │
+└─────────────────────────────────────────────────────────────────────────┘
+
+EXPLICACIÓN TÉCNICA:
+-------------------
+Los repositorios son interfaces que extienden JpaRepository<T, ID>,
+proporcionando métodos CRUD automáticos y permitiendo definir métodos
+personalizados siguiendo la convención de nombres de Spring Data JPA
+(Query Methods). Spring genera automáticamente la implementación en tiempo
+de ejecución sin necesidad de escribir código SQL manualmente.
+
+EXPLICACIÓN SIMPLE:
+------------------
+Los repositorios son como "asistentes" que saben cómo buscar, guardar,
+actualizar y eliminar información de la base de datos. Tú solo les dices
+"busca todos los juegos" o "guarda esta reseña" y ellos se encargan de
+todo el trabajo sucio de hablar con PostgreSQL.
+
+ARCHIVOS DE REPOSITORIOS:
+------------------------
+
+1. JuegoRepository.java
+   ├── Métodos automáticos: findAll(), findById(), save(), deleteById(), count()
+   ├── Métodos personalizados:
+   │   ├── findByTituloContainingIgnoreCase(String titulo)
+   │   │   → Busca juegos cuyo título contenga el texto (case-insensitive)
+   │   ├── findByGeneroIdGenero(Integer idGenero)
+   │   │   → Busca juegos de un género específico
+   │   ├── findByPlataformaIdPlataforma(Integer idPlataforma)
+   │   │   → Busca juegos de una plataforma específica
+   │   ├── findByEstudioIdEstudio(Integer idEstudio)
+   │   │   → Busca juegos de un estudio específico
+   │   └── findAllByOrderByCalificacionPromDesc()
+   │       → Obtiene todos los juegos ordenados por mejor calificación
+   └── Ubicación: src/main/java/.../repository/JuegoRepository.java
+
+2. ResenaRepository.java
+   ├── Métodos personalizados:
+   │   ├── findByJuegoIdJuego(Integer idJuego)
+   │   │   → Todas las reseñas de un juego
+   │   ├── findByUsuarioIdUsuario(Integer idUsuario)
+   │   │   → Todas las reseñas de un usuario
+   │   ├── findByJuegoIdJuegoOrderByFechaResenaDesc(Integer idJuego)
+   │   │   → Reseñas de un juego, más recientes primero
+   │   └── findByJuegoIdJuegoOrderByPuntuacionDesc(Integer idJuego)
+   │       → Reseñas de un juego, mejor puntuadas primero
+   └── Ubicación: src/main/java/.../repository/ResenaRepository.java
+
+3. UsuarioRepository.java
+   ├── Métodos personalizados:
+   │   ├── findByCorreo(String correo)
+   │   │   → Busca un usuario por su email
+   │   └── existsByCorreo(String correo)
+   │       → Verifica si existe un usuario con ese email
+   └── Ubicación: src/main/java/.../repository/UsuarioRepository.java
+
+4. EstudioRepository.java
+5. GeneroRepository.java
+6. PlataformaRepository.java
+   └── Similar a UsuarioRepository (findByNombre, existsByNombre)
+
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│ C. CONTROLADORES (ENDPOINTS REST API)                                   │
+└─────────────────────────────────────────────────────────────────────────┘
+
+EXPLICACIÓN TÉCNICA:
+-------------------
+Los controladores son clases anotadas con @RestController que exponen
+endpoints HTTP. Utilizan @RequestMapping para definir la ruta base,
+y métodos anotados con @GetMapping, @PostMapping, @PutMapping, @DeleteMapping
+para mapear operaciones HTTP a métodos Java. Devuelven ResponseEntity<T>
+para control granular de códigos HTTP. @CrossOrigin permite peticiones CORS
+desde el frontend.
+
+EXPLICACIÓN SIMPLE:
+------------------
+Los controladores son como "recepcionistas" que escuchan peticiones del
+frontend. Cuando el frontend dice "dame todos los juegos", el controlador
+recibe esa petición, le pide al repositorio que busque los juegos en la
+base de datos, y se los devuelve al frontend en formato JSON.
+
+ARCHIVOS DE CONTROLADORES:
+--------------------------
+
+1. JuegoController.java
+   Ruta base: /api/juegos
+
+   Endpoints disponibles:
+
+   GET /api/juegos
+   ├── Descripción: Obtiene todos los juegos
+   ├── Respuesta: Lista de juegos en JSON
+   └── Ejemplo: http://localhost:8080/api/juegos
+
+   GET /api/juegos/{id}
+   ├── Descripción: Obtiene un juego específico por su ID
+   ├── Parámetro: id del juego
+   └── Ejemplo: http://localhost:8080/api/juegos/1
+
+   GET /api/juegos/buscar?titulo=elden
+   ├── Descripción: Busca juegos por título (búsqueda parcial)
+   ├── Parámetro: titulo (query parameter)
+   └── Ejemplo: http://localhost:8080/api/juegos/buscar?titulo=elden
+
+   GET /api/juegos/genero/{idGenero}
+   ├── Descripción: Filtra juegos por género
+   └── Ejemplo: http://localhost:8080/api/juegos/genero/1
+
+   GET /api/juegos/plataforma/{idPlataforma}
+   ├── Descripción: Filtra juegos por plataforma
+   └── Ejemplo: http://localhost:8080/api/juegos/plataforma/1
+
+   GET /api/juegos/estudio/{idEstudio}
+   ├── Descripción: Filtra juegos por estudio
+   └── Ejemplo: http://localhost:8080/api/juegos/estudio/1
+
+   GET /api/juegos/top
+   ├── Descripción: Obtiene juegos ordenados por mejor calificación
+   └── Ejemplo: http://localhost:8080/api/juegos/top
+
+   POST /api/juegos
+   ├── Descripción: Crea un nuevo juego
+   ├── Requiere: Enviar datos del juego en JSON en el body
+   └── Uso: Para administradores (crear nuevos juegos en el catálogo)
+
+   PUT /api/juegos/{id}
+   ├── Descripción: Actualiza un juego existente
+   └── Uso: Para administradores (editar información de juegos)
+
+   DELETE /api/juegos/{id}
+   ├── Descripción: Elimina un juego
+   └── Uso: Para administradores
+
+   Ubicación: src/main/java/.../controller/JuegoController.java
+
+
+2. ResenaController.java
+   Ruta base: /api/resenas
+
+   Endpoints disponibles:
+
+   GET /api/resenas
+   ├── Descripción: Obtiene todas las reseñas
+   └── Ejemplo: http://localhost:8080/api/resenas
+
+   GET /api/resenas/{id}
+   ├── Descripción: Obtiene una reseña específica
+   └── Ejemplo: http://localhost:8080/api/resenas/1
+
+   GET /api/resenas/juego/{idJuego}
+   ├── Descripción: Obtiene todas las reseñas de un juego
+   └── Ejemplo: http://localhost:8080/api/resenas/juego/1
+
+   GET /api/resenas/juego/{idJuego}/recientes
+   ├── Descripción: Reseñas de un juego, ordenadas por fecha (más recientes primero)
+   └── Ejemplo: http://localhost:8080/api/resenas/juego/1/recientes
+
+   GET /api/resenas/juego/{idJuego}/top
+   ├── Descripción: Reseñas de un juego, ordenadas por puntuación
+   └── Ejemplo: http://localhost:8080/api/resenas/juego/1/top
+
+   GET /api/resenas/usuario/{idUsuario}
+   ├── Descripción: Obtiene todas las reseñas de un usuario
+   └── Ejemplo: http://localhost:8080/api/resenas/usuario/1
+
+   POST /api/resenas
+   ├── Descripción: Crea una nueva reseña
+   ├── Requiere: Enviar datos de la reseña en JSON
+   └── Uso: Cuando un usuario escribe una nueva reseña
+
+   PUT /api/resenas/{id}
+   ├── Descripción: Actualiza una reseña existente
+   └── Uso: Editar una reseña propia
+
+   DELETE /api/resenas/{id}
+   ├── Descripción: Elimina una reseña
+   └── Uso: Borrar una reseña propia
+
+   Ubicación: src/main/java/.../controller/ResenaController.java
+
+
+3. CatalogoController.java
+   Ruta base: /api/catalogo
+
+   Endpoints disponibles:
+
+   GET /api/catalogo/generos
+   ├── Descripción: Obtiene todos los géneros de juegos
+   └── Ejemplo: http://localhost:8080/api/catalogo/generos
+
+   GET /api/catalogo/generos/{id}
+   ├── Descripción: Obtiene un género específico
+   └── Ejemplo: http://localhost:8080/api/catalogo/generos/1
+
+   POST /api/catalogo/generos
+   ├── Descripción: Crea un nuevo género
+   └── Uso: Para administradores
+
+   GET /api/catalogo/plataformas
+   ├── Descripción: Obtiene todas las plataformas
+   └── Ejemplo: http://localhost:8080/api/catalogo/plataformas
+
+   GET /api/catalogo/plataformas/{id}
+   ├── Descripción: Obtiene una plataforma específica
+   └── Ejemplo: http://localhost:8080/api/catalogo/plataformas/1
+
+   POST /api/catalogo/plataformas
+   ├── Descripción: Crea una nueva plataforma
+   └── Uso: Para administradores
+
+   GET /api/catalogo/estudios
+   ├── Descripción: Obtiene todos los estudios de desarrollo
+   └── Ejemplo: http://localhost:8080/api/catalogo/estudios
+
+   GET /api/catalogo/estudios/{id}
+   ├── Descripción: Obtiene un estudio específico
+   └── Ejemplo: http://localhost:8080/api/catalogo/estudios/1
+
+   POST /api/catalogo/estudios
+   ├── Descripción: Crea un nuevo estudio
+   └── Uso: Para administradores
+
+   Ubicación: src/main/java/.../controller/CatalogoController.java
+
+
+4. TestController.java (Solo para pruebas)
+   Ruta base: /api/test
+
+   GET /api/test/repositories
+   ├── Descripción: Verifica que los repositorios funcionen y muestra conteos
+   └── Ejemplo: http://localhost:8080/api/test/repositories
+
+   GET /api/test/health
+   ├── Descripción: Verifica que el backend esté corriendo
+   └── Ejemplo: http://localhost:8080/api/test/health
+
+   Ubicación: src/main/java/.../controller/TestController.java
+
+
+CÓDIGOS DE RESPUESTA HTTP UTILIZADOS:
+-------------------------------------
+200 OK                    → Petición exitosa
+201 CREATED               → Recurso creado exitosamente (POST)
+204 NO CONTENT            → Operación exitosa pero sin datos (lista vacía o DELETE)
+404 NOT FOUND             → Recurso no encontrado
+500 INTERNAL SERVER ERROR → Error del servidor
+
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│ D. CONFIGURACIÓN (application.properties)                               │
+└─────────────────────────────────────────────────────────────────────────┘
+
+Ubicación: src/main/resources/application.properties
+
+CONTENIDO ACTUAL:
+----------------
+spring.application.name=game-reviews-backend
+
+# Configuración de la Conexión a PostgreSQL
+spring.datasource.url=jdbc:postgresql://localhost:5432/db_GameReviews
+spring.datasource.username=postgres
+spring.datasource.password=08012007
+
+# Configuración de Spring Data JPA (Hibernate)
+spring.jpa.hibernate.ddl-auto=none
+spring.jpa.show-sql=true
+spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
+
+EXPLICACIÓN DE CADA LÍNEA:
+--------------------------
+spring.datasource.url
+  → Dirección de la base de datos PostgreSQL
+  → localhost:5432 significa que PostgreSQL está en tu computadora, puerto 5432
+  → db_GameReviews es el nombre de la base de datos
+
+spring.datasource.username=postgres
+  → Usuario de PostgreSQL
+
+spring.datasource.password=08012007
+  → Contraseña de PostgreSQL
+
+spring.jpa.hibernate.ddl-auto=none
+  → NO modifica automáticamente las tablas de la base de datos
+  → Usamos "none" porque ya creamos las tablas manualmente con db_GR.sql
+
+spring.jpa.show-sql=true
+  → Muestra en la consola las consultas SQL que se ejecutan (útil para debug)
+
+spring.jpa.properties.hibernate.dialect=PostgreSQLDialect
+  → Le dice a Hibernate que use sintaxis específica de PostgreSQL
+
+
+================================================================================
+4. BASE DE DATOS
+================================================================================
+
+INFORMACIÓN DE LA BASE DE DATOS:
+--------------------------------
+Motor: PostgreSQL 18.0
+Nombre: db_GameReviews
+Puerto: 5432
+Usuario: postgres
+Contraseña: 08012007
+
+ARCHIVOS RELACIONADOS:
+---------------------
+1. db_GR.sql
+   ├── Ubicación: C:\Users\ml408\Documents\Basededatos1-main\game-reviews\db_GR.sql
+   ├── Propósito: Script que crea la estructura de la base de datos (tablas, relaciones)
+   └── Se ejecuta UNA SOLA VEZ al inicio del proyecto
+
+2. datos_prueba.sql
+   ├── Ubicación: C:\Users\ml408\Documents\Basededatos1-main\game-reviews\datos_prueba.sql
+   ├── Propósito: Script que inserta datos de prueba (juegos, usuarios, reseñas)
+   └── Se ejecuta UNA SOLA VEZ después de crear las tablas
+
+ESTRUCTURA DE TABLAS:
+---------------------
+
+1. usuario
+   ├── idusuario (PK, autoincremental)
+   ├── nombre (VARCHAR 100)
+   ├── correo (VARCHAR 150, UNIQUE)
+   ├── contrasenahash (VARCHAR 255)
+   └── cantidadresenas (INTEGER, default 0)
+
+2. estudio
+   ├── idestudio (PK, autoincremental)
+   └── nombre (VARCHAR 100)
+
+3. genero_juego
+   ├── idgenero (PK, autoincremental)
+   └── nombre (VARCHAR 100)
+
+4. plataforma
+   ├── idplataforma (PK, autoincremental)
+   └── nombre (VARCHAR 100)
+
+5. juego
+   ├── idjuego (PK, autoincremental)
+   ├── idestudio (FK → estudio)
+   ├── idgenero (FK → genero_juego)
+   ├── idplataforma (FK → plataforma)
+   ├── titulo (VARCHAR 150)
+   ├── fechalanzamiento (DATE)
+   ├── descripcion (TEXT)
+   ├── precio (NUMERIC 10,2)
+   └── calificacionprom (NUMERIC 3,2)
+
+6. resena
+   ├── idresena (PK, autoincremental)
+   ├── idusuario (FK → usuario)
+   ├── idjuego (FK → juego)
+   ├── comentario (TEXT)
+   ├── puntuacion (INTEGER, CHECK 1-10)
+   └── fecharesena (DATE, default CURRENT_DATE)
+
+7. consulta (no utilizada actualmente en el backend)
+   ├── idconsulta (PK, autoincremental)
+   ├── idusuario (FK → usuario)
+   ├── idjuego (FK → juego)
+   ├── idestudio (FK → estudio)
+   ├── descripcioncons (TEXT)
+   └── fechaconsulta (DATE, default CURRENT_DATE)
+
+DATOS DE PRUEBA INSERTADOS:
+---------------------------
+✓ 8 Estudios (FromSoftware, CD Projekt Red, Larian Studios, etc.)
+✓ 7 Géneros (RPG, Acción, Aventura, Simulación, Estrategia, Shooter, Indie)
+✓ 6 Plataformas (PC, PS5, Xbox Series X/S, Nintendo Switch, PS4, Xbox One)
+✓ 10 Juegos populares:
+  - Elden Ring
+  - Baldur's Gate 3
+  - Cyberpunk 2077
+  - The Legend of Zelda: Tears of the Kingdom
+  - Stardew Valley
+  - Helldivers 2
+  - Final Fantasy XVI
+  - The Witcher 3: Wild Hunt
+  - Sekiro: Shadows Die Twice
+  - Divinity: Original Sin 2
+✓ 4 Usuarios de prueba
+✓ 10 Reseñas de ejemplo
+
+
+================================================================================
+5. ENDPOINTS DISPONIBLES (RESUMEN COMPLETO)
+================================================================================
+
+URL BASE: http://localhost:8080
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│ ENDPOINTS DE JUEGOS                                                      │
+└─────────────────────────────────────────────────────────────────────────┘
+
+GET    /api/juegos                      → Listar todos los juegos
+GET    /api/juegos/{id}                 → Obtener juego por ID
+GET    /api/juegos/buscar?titulo=X      → Buscar juegos por título
+GET    /api/juegos/genero/{idGenero}    → Filtrar juegos por género
+GET    /api/juegos/plataforma/{idPlat}  → Filtrar juegos por plataforma
+GET    /api/juegos/estudio/{idEst}      → Filtrar juegos por estudio
+GET    /api/juegos/top                  → Juegos mejor calificados
+POST   /api/juegos                      → Crear nuevo juego
+PUT    /api/juegos/{id}                 → Actualizar juego
+DELETE /api/juegos/{id}                 → Eliminar juego
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│ ENDPOINTS DE RESEÑAS                                                     │
+└─────────────────────────────────────────────────────────────────────────┘
+
+GET    /api/resenas                         → Listar todas las reseñas
+GET    /api/resenas/{id}                    → Obtener reseña por ID
+GET    /api/resenas/juego/{idJuego}         → Reseñas de un juego
+GET    /api/resenas/juego/{id}/recientes    → Reseñas recientes de un juego
+GET    /api/resenas/juego/{id}/top          → Mejores reseñas de un juego
+GET    /api/resenas/usuario/{idUsuario}     → Reseñas de un usuario
+POST   /api/resenas                         → Crear nueva reseña
+PUT    /api/resenas/{id}                    → Actualizar reseña
+DELETE /api/resenas/{id}                    → Eliminar reseña
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│ ENDPOINTS DE CATÁLOGO                                                    │
+└─────────────────────────────────────────────────────────────────────────┘
+
+GET    /api/catalogo/generos               → Listar géneros
+GET    /api/catalogo/generos/{id}          → Obtener género por ID
+POST   /api/catalogo/generos               → Crear género
+
+GET    /api/catalogo/plataformas           → Listar plataformas
+GET    /api/catalogo/plataformas/{id}      → Obtener plataforma por ID
+POST   /api/catalogo/plataformas           → Crear plataforma
+
+GET    /api/catalogo/estudios              → Listar estudios
+GET    /api/catalogo/estudios/{id}         → Obtener estudio por ID
+POST   /api/catalogo/estudios              → Crear estudio
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│ ENDPOINTS DE PRUEBA                                                      │
+└─────────────────────────────────────────────────────────────────────────┘
+
+GET    /api/test/repositories              → Ver conteos de datos
+GET    /api/test/health                    → Verificar estado del servidor
+
+
+================================================================================
+6. CÓMO EJECUTAR EL PROYECTO
+================================================================================
+
+REQUISITOS PREVIOS:
+------------------
+✓ Java 21 o superior instalado
+✓ PostgreSQL 18.0 instalado y corriendo
+✓ NetBeans 21 instalado (o cualquier IDE Java)
+✓ Maven (viene integrado con NetBeans)
+
+PASOS PARA EJECUTAR:
+-------------------
+
+1. VERIFICAR QUE POSTGRESQL ESTÉ CORRIENDO
+   ────────────────────────────────────────
+   - Abre pgAdmin
+   - Conéctate al servidor PostgreSQL
+   - Verifica que la base de datos "db_GameReviews" exista
+   - Si no existe, ejecuta el script db_GR.sql
+   - Si no hay datos, ejecuta el script datos_prueba.sql
+
+2. ABRIR EL PROYECTO EN NETBEANS
+   ──────────────────────────────
+   - Abre NetBeans
+   - File → Open Project
+   - Navega a: C:\Users\ml408\Documents\Basededatos1-main\game-reviews\game-reviews-backend
+   - Selecciona el proyecto y haz clic en "Open Project"
+
+3. ESPERAR A QUE MAVEN DESCARGUE DEPENDENCIAS
+   ───────────────────────────────────────────
+   - NetBeans descargará automáticamente todas las librerías necesarias
+   - Verás una barra de progreso en la esquina inferior derecha
+   - Espera a que termine (puede tomar 1-2 minutos la primera vez)
+
+4. VERIFICAR LA CONFIGURACIÓN
+   ───────────────────────────
+   - Abre: src/main/resources/application.properties
+   - Verifica que la contraseña de PostgreSQL sea correcta
+   - Si cambiaste la contraseña, actualízala aquí
+
+5. EJECUTAR LA APLICACIÓN
+   ──────────────────────
+   - Haz clic derecho en el proyecto "game-reviews-backend"
+   - Selecciona "Run" (o presiona F6)
+   - Espera a que la consola muestre: "Started GameReviewsBackendApplication in X seconds"
+
+6. VERIFICAR QUE FUNCIONA
+   ──────────────────────
+   - Abre tu navegador
+   - Visita: http://localhost:8080/api/test/health
+   - Deberías ver: {"status":"UP","mensaje":"Backend funcionando correctamente"}
+
+7. PROBAR LOS ENDPOINTS
+   ────────────────────
+   - Visita: http://localhost:8080/api/juegos
+   - Deberías ver una lista de 10 juegos en formato JSON
+
+¡LISTO! El backend está corriendo en http://localhost:8080
+
+
+CÓMO DETENER LA APLICACIÓN:
+---------------------------
+- En NetBeans, haz clic en el cuadrado rojo "Stop" en la barra de herramientas
+- O presiona Shift + F6
+
+
+================================================================================
+7. CÓMO CONECTAR EL FRONTEND AL BACKEND
+================================================================================
+
+CONCEPTOS IMPORTANTES:
+---------------------
+
+1. ¿QUÉ ES UNA API REST?
+   Una API REST es como un "menú de servicios" que el backend ofrece.
+   El frontend puede "pedir" información o "enviar" información usando URLs.
+
+2. ¿CÓMO SE COMUNICAN FRONTEND Y BACKEND?
+   El frontend hace peticiones HTTP al backend usando JavaScript.
+   La herramienta principal es la función fetch().
+
+3. ¿QUÉ ES JSON?
+   JSON es el formato en que se intercambian datos entre frontend y backend.
+   Es como un lenguaje común que ambos entienden.
+   Ejemplo: {"titulo": "Elden Ring", "precio": 59.99}
+
+4. ¿QUÉ ES CORS?
+   CORS permite que el frontend (en un puerto) hable con el backend (en otro puerto).
+   Ya está configurado en el backend con @CrossOrigin(origins = "*")
+
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│ MÉTODO 1: OBTENER DATOS DEL BACKEND (GET)                               │
+└─────────────────────────────────────────────────────────────────────────┘
+
+EJEMPLO 1: Obtener todos los juegos
+────────────────────────────────────
+
+En tu archivo scripts.js, en lugar de cargar juegos.json:
+
+// ANTES (usando archivo local):
+fetch('data/juegos.json')
+  .then(response => response.json())
+  .then(juegos => {
+    // Mostrar juegos en el HTML
+  });
+
+// DESPUÉS (usando el backend):
+fetch('http://localhost:8080/api/juegos')
+  .then(response => response.json())
+  .then(juegos => {
+    console.log(juegos); // Ver en consola del navegador
+
+    // Ahora puedes usar los datos para llenar tu HTML
+    juegos.forEach(juego => {
+      console.log(juego.titulo);      // Título del juego
+      console.log(juego.precio);      // Precio
+      console.log(juego.descripcion); // Descripción
+      // etc.
+    });
+  })
+  .catch(error => {
+    console.error('Error al obtener juegos:', error);
+  });
+
+
+EJEMPLO 2: Obtener un juego específico
+───────────────────────────────────────
+
+// Obtener el juego con ID 1
+fetch('http://localhost:8080/api/juegos/1')
+  .then(response => response.json())
+  .then(juego => {
+    console.log(juego.titulo);
+    console.log(juego.estudio.nombre);  // Nombre del estudio
+    console.log(juego.genero.nombre);   // Nombre del género
+    console.log(juego.plataforma.nombre); // Nombre de la plataforma
+  });
+
+
+EJEMPLO 3: Buscar juegos por título
+────────────────────────────────────
+
+// Buscar juegos que contengan "elden" en el título
+fetch('http://localhost:8080/api/juegos/buscar?titulo=elden')
+  .then(response => response.json())
+  .then(juegos => {
+    console.log('Juegos encontrados:', juegos.length);
+    juegos.forEach(juego => console.log(juego.titulo));
+  });
+
+
+EJEMPLO 4: Obtener reseñas de un juego
+───────────────────────────────────────
+
+// Obtener reseñas del juego con ID 1
+fetch('http://localhost:8080/api/resenas/juego/1')
+  .then(response => response.json())
+  .then(resenas => {
+    resenas.forEach(resena => {
+      console.log('Comentario:', resena.comentario);
+      console.log('Puntuación:', resena.puntuacion);
+      console.log('Fecha:', resena.fechaResena);
+    });
+  });
+
+
+EJEMPLO 5: Obtener géneros para un filtro
+──────────────────────────────────────────
+
+// Llenar un <select> con géneros
+fetch('http://localhost:8080/api/catalogo/generos')
+  .then(response => response.json())
+  .then(generos => {
+    const selectGenero = document.getElementById('filtroGenero');
+
+    generos.forEach(genero => {
+      const option = document.createElement('option');
+      option.value = genero.idGenero;
+      option.textContent = genero.nombre;
+      selectGenero.appendChild(option);
+    });
+  });
+
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│ MÉTODO 2: ENVIAR DATOS AL BACKEND (POST)                                │
+└─────────────────────────────────────────────────────────────────────────┘
+
+EJEMPLO 6: Crear una nueva reseña
+──────────────────────────────────
+
+// Datos de la nueva reseña
+const nuevaResena = {
+  usuario: {
+    idUsuario: 1  // ID del usuario que escribe la reseña
+  },
+  juego: {
+    idJuego: 2    // ID del juego que se está reseñando
+  },
+  comentario: "¡Baldur's Gate 3 es increíble! La mejor experiencia RPG en años.",
+  puntuacion: 10  // Puntuación de 1 a 10
+};
+
+// Enviar la reseña al backend
+fetch('http://localhost:8080/api/resenas', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify(nuevaResena)
+})
+.then(response => response.json())
+.then(resenaCreada => {
+  console.log('Reseña creada exitosamente:', resenaCreada);
+  alert('¡Tu reseña ha sido publicada!');
+})
+.catch(error => {
+  console.error('Error al crear reseña:', error);
+  alert('Hubo un error al publicar tu reseña');
+});
+
+
+EJEMPLO 7: Formulario de reseña completo
+─────────────────────────────────────────
+
+HTML:
+<form id="formResena">
+  <input type="hidden" id="idUsuario" value="1">
+  <input type="hidden" id="idJuego" value="1">
+
+  <label>Comentario:</label>
+  <textarea id="comentario" required></textarea>
+
+  <label>Puntuación (1-10):</label>
+  <input type="number" id="puntuacion" min="1" max="10" required>
+
+  <button type="submit">Publicar Reseña</button>
+</form>
+
+JavaScript:
+document.getElementById('formResena').addEventListener('submit', function(e) {
+  e.preventDefault(); // Evitar que el formulario recargue la página
+
+  const resena = {
+    usuario: {
+      idUsuario: parseInt(document.getElementById('idUsuario').value)
+    },
+    juego: {
+      idJuego: parseInt(document.getElementById('idJuego').value)
+    },
+    comentario: document.getElementById('comentario').value,
+    puntuacion: parseInt(document.getElementById('puntuacion').value)
+  };
+
+  fetch('http://localhost:8080/api/resenas', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(resena)
+  })
+  .then(response => {
+    if (response.ok) {
+      return response.json();
+    } else {
+      throw new Error('Error al crear la reseña');
+    }
+  })
+  .then(data => {
+    alert('¡Reseña publicada exitosamente!');
+    document.getElementById('formResena').reset(); // Limpiar formulario
+    // Aquí puedes recargar las reseñas para mostrar la nueva
+  })
+  .catch(error => {
+    console.error('Error:', error);
+    alert('Hubo un problema al publicar tu reseña');
+  });
+});
+
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│ MÉTODO 3: ACTUALIZAR DATOS (PUT)                                        │
+└─────────────────────────────────────────────────────────────────────────┘
+
+EJEMPLO 8: Editar una reseña existente
+───────────────────────────────────────
+
+const resenaActualizada = {
+  comentario: "Comentario actualizado después de jugar más horas",
+  puntuacion: 9
+};
+
+fetch('http://localhost:8080/api/resenas/1', {  // 1 es el ID de la reseña
+  method: 'PUT',
+  headers: {
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify(resenaActualizada)
+})
+.then(response => response.json())
+.then(data => {
+  console.log('Reseña actualizada:', data);
+  alert('Reseña actualizada correctamente');
+});
+
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│ MÉTODO 4: ELIMINAR DATOS (DELETE)                                       │
+└─────────────────────────────────────────────────────────────────────────┘
+
+EJEMPLO 9: Eliminar una reseña
+───────────────────────────────
+
+fetch('http://localhost:8080/api/resenas/5', {  // 5 es el ID de la reseña
+  method: 'DELETE'
+})
+.then(response => {
+  if (response.ok) {
+    alert('Reseña eliminada correctamente');
+    // Aquí puedes recargar la lista de reseñas
+  } else {
+    alert('Error al eliminar la reseña');
+  }
+});
+
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│ EJEMPLO COMPLETO: PÁGINA DE JUEGOS                                      │
+└─────────────────────────────────────────────────────────────────────────┘
+
+HTML:
+<div id="listaJuegos"></div>
+
+JavaScript:
+function cargarJuegos() {
+  fetch('http://localhost:8080/api/juegos')
+    .then(response => response.json())
+    .then(juegos => {
+      const contenedor = document.getElementById('listaJuegos');
+      contenedor.innerHTML = ''; // Limpiar contenedor
+
+      juegos.forEach(juego => {
+        const juegoDiv = document.createElement('div');
+        juegoDiv.className = 'juego-card';
+        juegoDiv.innerHTML = `
+          <h3>${juego.titulo}</h3>
+          <p><strong>Estudio:</strong> ${juego.estudio.nombre}</p>
+          <p><strong>Género:</strong> ${juego.genero.nombre}</p>
+          <p><strong>Plataforma:</strong> ${juego.plataforma.nombre}</p>
+          <p><strong>Precio:</strong> $${juego.precio}</p>
+          <p><strong>Calificación:</strong> ${juego.calificacionProm}/10</p>
+          <p>${juego.descripcion}</p>
+          <button onclick="verReseñas(${juego.idJuego})">Ver Reseñas</button>
+        `;
+        contenedor.appendChild(juegoDiv);
+      });
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      alert('No se pudieron cargar los juegos');
+    });
+}
+
+function verReseñas(idJuego) {
+  fetch(`http://localhost:8080/api/resenas/juego/${idJuego}`)
+    .then(response => response.json())
+    .then(resenas => {
+      console.log('Reseñas del juego:', resenas);
+      // Aquí mostrarías las reseñas en un modal o en otra sección
+    });
+}
+
+// Cargar juegos cuando la página se cargue
+document.addEventListener('DOMContentLoaded', cargarJuegos);
+
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│ MANEJO DE ERRORES Y ESTADOS DE CARGA                                    │
+└─────────────────────────────────────────────────────────────────────────┘
+
+EJEMPLO 10: Con loading y manejo de errores completo
+─────────────────────────────────────────────────────
+
+function cargarJuegosConLoading() {
+  // Mostrar indicador de carga
+  const contenedor = document.getElementById('listaJuegos');
+  contenedor.innerHTML = '<p>Cargando juegos...</p>';
+
+  fetch('http://localhost:8080/api/juegos')
+    .then(response => {
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return response.json();
+    })
+    .then(juegos => {
+      if (juegos.length === 0) {
+        contenedor.innerHTML = '<p>No hay juegos disponibles</p>';
+        return;
+      }
+
+      // Renderizar juegos
+      contenedor.innerHTML = '';
+      juegos.forEach(juego => {
+        // ... código para mostrar juegos
+      });
+    })
+    .catch(error => {
+      console.error('Error al cargar juegos:', error);
+      contenedor.innerHTML = '<p class="error">Error al cargar los juegos. Por favor, intenta de nuevo más tarde.</p>';
+    });
+}
+
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│ CONSEJOS IMPORTANTES PARA EL FRONTEND                                   │
+└─────────────────────────────────────────────────────────────────────────┘
+
+1. SIEMPRE VERIFICAR QUE EL BACKEND ESTÉ CORRIENDO
+   - El backend debe estar ejecutándose en NetBeans
+   - Debe mostrar "Started GameReviewsBackendApplication"
+   - Si no está corriendo, las peticiones fallarán con error de red
+
+2. USA LA CONSOLA DEL NAVEGADOR PARA DEBUGGEAR
+   - Presiona F12 en el navegador
+   - Ve a la pestaña "Console" para ver errores
+   - Ve a la pestaña "Network" para ver las peticiones HTTP
+
+3. VERIFICA LOS DATOS ANTES DE ENVIARLOS
+   - Asegúrate de que los IDs sean números (usa parseInt)
+   - Verifica que la puntuación esté entre 1 y 10
+   - No envíes campos vacíos obligatorios
+
+4. MANEJA LOS ERRORES APROPIADAMENTE
+   - Siempre usa .catch() para capturar errores
+   - Muestra mensajes amigables al usuario
+   - No dejes que la aplicación se rompa silenciosamente
+
+5. PRUEBA CON DIFERENTES ESCENARIOS
+   - Qué pasa si no hay datos
+   - Qué pasa si el backend no responde
+   - Qué pasa si hay un error de validación
+
+
+================================================================================
+8. SOLUCIÓN DE PROBLEMAS COMUNES
+================================================================================
+
+PROBLEMA 1: "Error: connect ECONNREFUSED" o "Failed to fetch"
+──────────────────────────────────────────────────────────────
+CAUSA: El backend no está corriendo
+SOLUCIÓN:
+  1. Abre NetBeans
+  2. Ejecuta el proyecto game-reviews-backend (F6)
+  3. Espera a ver "Started GameReviewsBackendApplication"
+  4. Intenta de nuevo en el navegador
+
+
+PROBLEMA 2: El backend no inicia - "Port 8080 was already in use"
+──────────────────────────────────────────────────────────────────
+CAUSA: Ya hay otra instancia corriendo en el puerto 8080
+SOLUCIÓN:
+  1. Detén todas las instancias en NetBeans
+  2. O cambia el puerto en application.properties:
+     server.port=8081
+  3. Actualiza las URLs del frontend para usar el nuevo puerto
+
+
+PROBLEMA 3: "HikariPool-1 - Exception... Connection refused"
+─────────────────────────────────────────────────────────────
+CAUSA: PostgreSQL no está corriendo o la configuración es incorrecta
+SOLUCIÓN:
+  1. Abre pgAdmin y verifica que PostgreSQL esté corriendo
+  2. Verifica que la base de datos "db_GameReviews" exista
+  3. Verifica usuario/contraseña en application.properties
+  4. Verifica que el puerto sea 5432
+
+
+PROBLEMA 4: "No se pueden ver los datos en el navegador"
+─────────────────────────────────────────────────────────
+CAUSA: La base de datos está vacía
+SOLUCIÓN:
+  1. Abre pgAdmin
+  2. Conecta a la base de datos db_GameReviews
+  3. Query Tool → Abrir archivo datos_prueba.sql
+  4. Ejecuta el script (F5)
+  5. Verifica: http://localhost:8080/api/test/repositories
+
+
+PROBLEMA 5: "CORS error" al llamar desde el frontend
+─────────────────────────────────────────────────────
+CAUSA: Problema de configuración CORS
+SOLUCIÓN:
+  - Ya está resuelto con @CrossOrigin(origins = "*") en los controllers
+  - Si persiste, verifica que estés usando http:// (no file://)
+  - El frontend debe abrirse en un servidor (Live Server, http-server, etc.)
+
+
+PROBLEMA 6: "JSON parse error" al enviar datos
+───────────────────────────────────────────────
+CAUSA: Los datos enviados no están en formato JSON correcto
+SOLUCIÓN:
+  1. Verifica que uses JSON.stringify(objeto) en el body
+  2. Verifica que el header sea 'Content-Type': 'application/json'
+  3. Verifica que la estructura del objeto sea correcta
+
+
+PROBLEMA 7: La aplicación se compila pero no responde
+──────────────────────────────────────────────────────
+CAUSA: Error en algún endpoint o configuración
+SOLUCIÓN:
+  1. Revisa la consola de NetBeans para ver el error completo
+  2. Busca líneas rojas con "ERROR" o "Exception"
+  3. Verifica que todos los archivos .java estén sin errores de compilación
+
+
+PROBLEMA 8: Lombok no funciona - "cannot find symbol getters/setters"
+──────────────────────────────────────────────────────────────────────
+CAUSA: Lombok no está configurado correctamente en el IDE
+SOLUCIÓN:
+  1. Verifica que Lombok esté en el pom.xml (ya está)
+  2. En NetBeans: Tools → Plugins → Installed → Busca "Lombok"
+  3. Si no está, instálalo desde Available Plugins
+  4. Reinicia NetBeans
+
+
+================================================================================
+9. PRÓXIMOS PASOS Y MEJORAS
+================================================================================
+
+FUNCIONALIDADES QUE PUEDEN AGREGAR:
+───────────────────────────────────
+
+1. SISTEMA DE AUTENTICACIÓN
+   ├── Implementar login/registro de usuarios
+   ├── Usar JWT (JSON Web Tokens) para sesiones
+   ├── Hash de contraseñas con BCrypt
+   └── Proteger endpoints (solo usuarios autenticados pueden crear reseñas)
+
+2. VALIDACIONES MÁS ROBUSTAS
+   ├── Validar que el título del juego no esté vacío
+   ├── Validar formato de email
+   ├── Validar que la puntuación sea 1-10 (ya está en BD, falta en Java)
+   └── Mensajes de error más descriptivos
+
+3. PAGINACIÓN
+   ├── No cargar todos los juegos de una vez
+   ├── Implementar: GET /api/juegos?page=1&size=10
+   └── Mejor rendimiento con muchos datos
+
+4. BÚSQUEDA AVANZADA
+   ├── Filtros combinados (género + plataforma + precio)
+   ├── Ordenamiento personalizado
+   └── Búsqueda por rango de precios
+
+5. CARGA DE IMÁGENES
+   ├── Permitir subir imágenes de juegos
+   ├── Almacenar en servidor o servicio cloud
+   └── Devolver URLs de imágenes en las respuestas
+
+6. ESTADÍSTICAS
+   ├── Juego más reseñado
+   ├── Usuario más activo
+   ├── Promedio de calificaciones por género
+   └── Tendencias de juegos por mes
+
+7. SISTEMA DE "ME GUSTA" EN RESEÑAS
+   ├── Votar reseñas útiles/no útiles
+   ├── Ordenar reseñas por votos
+   └── Nueva tabla: voto_resena
+
+8. NOTIFICACIONES
+   ├── Email cuando alguien comenta tu reseña
+   ├── Notificar nuevos juegos de géneros favoritos
+   └── Integración con servicios de email (JavaMail)
+
+9. MODERACIÓN
+   ├── Reportar reseñas inapropiadas
+   ├── Panel de administrador
+   └── Banear usuarios
+
+10. DESPLIEGUE EN PRODUCCIÓN
+    ├── Dockerizar la aplicación
+    ├── Subir a Heroku, Railway o AWS
+    ├── Configurar base de datos en la nube
+    └── Dominio personalizado
+
+
+RECURSOS PARA APRENDER MÁS:
+───────────────────────────
+
+Spring Boot Oficial: https://spring.io/projects/spring-boot
+Tutorial Spring Data JPA: https://spring.io/guides/gs/accessing-data-jpa/
+Tutorial REST API: https://spring.io/guides/gs/rest-service/
+PostgreSQL Docs: https://www.postgresql.org/docs/
+
+
+================================================================================
+GLOSARIO DE TÉRMINOS
+================================================================================
+
+API: Application Programming Interface - Interfaz que permite la comunicación
+     entre diferentes aplicaciones
+
+REST: Representational State Transfer - Estilo de arquitectura para APIs web
+
+JSON: JavaScript Object Notation - Formato de intercambio de datos
+
+CRUD: Create, Read, Update, Delete - Operaciones básicas sobre datos
+
+JPA: Java Persistence API - Especificación para manejar datos en Java
+
+Hibernate: Implementación de JPA, ORM para mapear objetos Java a tablas BD
+
+ORM: Object-Relational Mapping - Mapeo entre objetos y base de datos relacional
+
+Entity: Entidad, clase Java que representa una tabla de base de datos
+
+Repository: Clase que maneja el acceso a datos (operaciones de BD)
+
+Controller: Clase que maneja peticiones HTTP y devuelve respuestas
+
+DTO: Data Transfer Object - Objeto para transferir datos entre capas
+
+Endpoint: URL específica de la API que realiza una operación
+
+HTTP Methods: GET (obtener), POST (crear), PUT (actualizar), DELETE (eliminar)
+
+Request: Petición HTTP del cliente al servidor
+
+Response: Respuesta HTTP del servidor al cliente
+
+Status Code: Código numérico que indica el resultado de una petición HTTP
+             (200 OK, 404 Not Found, 500 Error, etc.)
+
+CORS: Cross-Origin Resource Sharing - Permite peticiones desde otros dominios
+
+Maven: Herramienta de gestión de dependencias y construcción de proyectos Java
+
+Spring Boot: Framework de Java que simplifica el desarrollo de aplicaciones
+
+Lombok: Librería que reduce código repetitivo (getters, setters, constructores)
+
+PostgreSQL: Sistema de gestión de bases de datos relacional
+
+Foreign Key (FK): Clave foránea, referencia a otra tabla
+
+Primary Key (PK): Clave primaria, identificador único de un registro
+

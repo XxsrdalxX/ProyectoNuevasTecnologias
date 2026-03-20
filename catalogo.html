@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GameReview - Catálogo Dinámico</title>
+    <!-- Carga Tailwind para las clases base y utilidades como flex, grid, etc. -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts - Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- Importa tus estilos CSS personalizados -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- HEADER / NAVBAR -->
+    <header>
+        <nav class="navbar">
+            <div class="nav-container">
+                <a href="index.html" class="logo">GameReview</a>
+                <ul class="nav-menu">
+                    <li><a href="index.html" class="nav-link">Inicio</a></li>
+                    <li><a href="catalogo.html" class="nav-link">Catálogo</a></li>
+                    <li><a href="consolas.html" class="nav-link">Consolas</a></li>
+                </ul>
+                <div class="nav-right">
+                    <a href="registro.html" class="register-btn">Registrarse</a>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <main class="main-content max-w-7xl mx-auto p-4">
+        <!-- Sección de filtros opcionales -->
+        <section class="filters-section mt-8 mb-4">
+            <div class="flex flex-wrap gap-4 items-center">
+                <button onclick="cargarJuegos()" class="filter-btn">
+                    🎮 Todos los Juegos
+                </button>
+                <button onclick="cargarTopJuegos()" class="filter-btn">
+                    ⭐ Mejor Calificados
+                </button>
+                <!-- Puedes agregar más filtros aquí -->
+            </div>
+        </section>
+
+        <!-- Sección del catálogo -->
+        <section class="catalog-section mt-8">
+            <div class="section-header flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-purple-400">Catálogo de Juegos</h2>
+                <div class="search-container">
+                    <input 
+                        type="text" 
+                        id="searchInput" 
+                        placeholder="Buscar juegos..." 
+                        class="search-input p-2 rounded-lg border border-gray-600 bg-gray-800 text-white"
+                    >
+                </div>
+            </div>
+            
+            <!-- Grid de juegos (se llena dinámicamente con JS) -->
+            <div id="gamesGrid" class="games-grid grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                <!-- Los juegos se cargarán aquí dinámicamente desde catalogo.js -->
+                <div class="loading-spinner">
+                    <div class="spinner"></div>
+                    <p>Cargando juegos...</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- FOOTER -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-brand">
+                <h2 class="logo">GameReview</h2>
+                <p>Tu sitio de reseñas de videojuegos</p>
+                <div class="social-links">
+                    <a href="#" title="Twitter">🐦</a>
+                    <a href="#" title="Discord">💬</a>
+                    <a href="#" title="YouTube">📺</a>
+                </div>
+            </div>
+            <div class="footer-links">
+                <h3>Enlaces</h3>
+                <ul>
+                    <li>Sobre nosotros</li>
+                    <li>Contacto</li>
+                    <li>Términos de uso</li>
+                    <li>Política de privacidad</li>
+                </ul>
+            </div>
+            <div class="footer-info">
+                <p>© 2024 GameReview. Todos los derechos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- SCRIPT DE CONEXIÓN CON EL BACKEND -->
+    <script src="catalogo.js"></script>
+</body>
+</html>
