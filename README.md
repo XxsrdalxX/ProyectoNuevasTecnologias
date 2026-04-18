@@ -34,29 +34,7 @@ GET http://localhost:8080/api/juegos
 GET http://localhost:8080/api/juegos/1
 GET http://localhost:8080/api/resenas
 POST http://localhost:8080/api/analytics/pageview
-Content-Type: application/json
-
-{
-  "session_id": "ses_prueba_001",
-  "tipo_pagina": "detalle_juego",
-  "idjuego": 1,
-  "idusuario": 1,
-  "tiempo_en_pagina_seg": 120,
-  "scroll_porcentaje": 80,
-  "dispositivo": "desktop",
-  "pais": "CO"
-}
-
 POST http://localhost:8080/api/analytics/interaction
-Content-Type: application/json
-
-{
-  "session_id": "ses_prueba_001",
-  "idjuego": 1,
-  "accion": "click_escribir_resena",
-  "idusuario": 1
-}
-
 ENDPOINTS COMBINADOS NO SQL+SQL:
 GET http://localhost:8080/api/analytics/juego/1/stats
 GET http://localhost:8080/api/analytics/usuario/1/perfil
