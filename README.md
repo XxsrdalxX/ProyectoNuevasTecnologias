@@ -14,8 +14,7 @@ pip install -r ./requirements.txt
 5. Crear la DB
    En pgadmin4 o postrgres deberan crear una db llamada db_GameReviews
 y luego ejecutar el archivo llamado db_GR.sql, seguido de eso insertaran los datos  del archivo datos_prueba.sql para insertar datos
-
-Para NoSQL ejecutar este archivo py seed.py para poder crear las colecciones
+ Para NoSQL ejecutar este archivo py seed.py para poder crear las colecciones
  Importante: el seed de MongoDB referencia los IDs de juegos y usuarios de PostgreSQL. Asegúrate de tener al menos 5–10 juegos y 2–3 usuarios antes de continuar
  6. Iniciar MONGODB
  Este comando requiere PowerShell abierto como administrador:
