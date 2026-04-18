@@ -1,22 +1,24 @@
 from flask import Flask, jsonify
 from flask_cors import CORS
 from database import db
+from mongo_database import init_mongo_indexes, check_mongo_connection
 
 from routes.catalogo import catalogo_bp
 from routes.juegos import juegos_bp
 from routes.resenas import resenas_bp
 from routes.usuarios import usuarios_bp
 from routes.test import test_bp
+from routes.analytics import analytics_bp   # ← nuevo blueprint NoSQL
 
 app = Flask(__name__)
 
-# Configuración de la base de datos
+# ─── Configuración PostgreSQL (sin cambios) ───────────────────────────────────
 app.config["SQLALCHEMY_DATABASE_URI"] = (
     "postgresql://postgres:08012007@localhost:5432/db_GameReviews"
 )
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
-# CORS — mismos orígenes que el backend Java
+# CORS
 CORS(app, origins="*")
 
 # Inicializar SQLAlchemy
@@ -28,6 +30,16 @@ app.register_blueprint(juegos_bp)
 app.register_blueprint(resenas_bp)
 app.register_blueprint(usuarios_bp)
 app.register_blueprint(test_bp)
+app.register_blueprint(analytics_bp)        # ← analytics NoSQL
+
+# ─── Inicializar índices MongoDB al arrancar ──────────────────────────────────
+with app.app_context():
+    if check_mongo_connection():
+        init_mongo_indexes()
+        print("[MongoDB] Conectado y listo.")
+    else:
+        print("[MongoDB] ADVERTENCIA: No se pudo conectar a MongoDB. "
+              "Los endpoints de analytics no estarán disponibles.")
 
 
 # Manejo de errores globales
