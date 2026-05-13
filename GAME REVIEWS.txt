@@ -1,0 +1,169 @@
+GAME REVIEWS
+Plataforma de Reseñas de Videojuegos
+Entrega 1 — Definición, Modelado y Estructura SQL
+Dylan Felipe Cárdenas Salcedo
+Michael Ferney Lozano Salinas
+Marzo 2026
+Componente Conceptual
+1. Definición del Problema
+Situación Actual
+El mundo de los videojuegos ha crecido enormemente, pero los jugadores enfrentan información dispersa en
+múltiples plataformas, foros y redes sociales. No existe un espacio centralizado donde puedan consultar reseñas
+estructuradas, ver calificaciones confiables y explorar catálogos organizados de manera clara.
+Necesidad Detectada
+Se requiere una plataforma web especializada que permita a los usuarios:
+• Consultar un catálogo de videojuegos con información completa (género, estudio, plataforma, precio).
+• Leer y publicar reseñas con una puntuación estandarizada del 1 al 10.
+• Ver la calificación promedio de cada juego calculada a partir de las reseñas de la comunidad.
+• Filtrar y buscar juegos según sus preferencias (por género, plataforma, estudio o título).
+• Gestionar su perfil y el historial de reseñas publicadas.
+2. Casos de Uso
+Actores del Sistema
+Actor Descripción
+Visitante Usuario sin cuenta. Puede consultar el catálogo y leer
+reseñas.
+Usuario Registrado Tiene cuenta activa. Puede publicar, editar y eliminar
+sus propias reseñas.
+Administrador Gestiona el catálogo: crea y elimina juegos, géneros,
+plataformas y estudios.
+CU-01 — Consultar Catálogo de Juegos
+Actor Visitante / Usuario Registrado
+Descripción El usuario accede al catálogo y puede explorar todos los juegos disponibles.
+Funcionalidades Ver lista de juegos · Filtrar por género, plataforma o estudio · Buscar por título · Ver
+juegos con mejor calificación
+CU-02 — Ver Detalle de un Juego
+Actor Visitante / Usuario Registrado
+Descripción El usuario selecciona un juego para ver su ficha completa y las reseñas de la comunidad.
+Funcionalidades Ver título, descripción, fecha de lanzamiento, precio y calificación promedio · Leer
+reseñas ordenadas por fecha o puntuación
+CU-03 — Publicar una Reseña
+Actor Usuario Registrado
+Descripción El usuario autenticado escribe una reseña para un juego asignando puntuación y
+comentario.
+Funcionalidades Seleccionar juego · Ingresar puntuación (1–10) · Escribir comentario opcional · Guardar
+reseña
+Validaciones Puntuación obligatoria entre 1 y 10 · El usuario y el juego deben existir en el sistema
+CU-04 — Gestionar Reseñas
+Actor Usuario Registrado
+Descripción El usuario puede editar o eliminar reseñas que haya publicado previamente.
+Funcionalidades Editar comentario o puntuación · Eliminar reseña · Ver historial propio de reseñas
+CU-05 — Administrar Catálogo
+Actor Administrador
+Descripción El administrador mantiene actualizado el catálogo de juegos y sus categorías.
+Funcionalidades Crear, actualizar y eliminar juegos · Crear géneros, plataformas y estudios · Eliminar
+usuarios si es necesario
+Relaciones entre Entidades
+Entidad origen Cardinalidad Entidad destino Descripción
+estudio 1 : N juego Un estudio desarrolla
+uno o varios juegos.
+genero_juego 1 : N juego Un género agrupa uno o
+varios juegos.
+plataforma 1 : N juego Una plataforma soporta
+uno o varios juegos.
+juego 1 : N resena Un juego puede recibir
+muchas reseñas.
+usuario 1 : N resena Un usuario puede
+publicar muchas reseñas.
+4. Diccionario de Datos
+Tabla: estudio
+Almacena los estudios de desarrollo de videojuegos.
+Atributo Tipo Restricción Descripción
+idestudio INTEGER PK · Auto-incremental Identificador único del estudio
+nombre VARCHAR(100) NOT NULL Nombre del estudio (ej: CD Projekt Red)
+Tabla: genero_juego
+Catálogo de géneros disponibles para clasificar los juegos.
+Atributo Tipo Restricción Descripción
+idgenero INTEGER PK · Auto-incremental Identificador único del género
+nombre VARCHAR(100) NOT NULL Nombre del género (ej: RPG, Acción,
+Estrategia)
+Tabla: plataforma
+Catálogo de plataformas en las que pueden publicarse los juegos.
+Atributo Tipo Restricción Descripción
+idplataforma INTEGER PK · Auto-incremental Identificador único de la plataforma
+nombre VARCHAR(100) NOT NULL Nombre de la plataforma (ej: PC, PS5,
+Xbox)
+Tabla: juego
+Entidad central del sistema. Almacena la información completa de cada videojuego.
+Atributo Tipo Restricción Descripción
+idjuego INTEGER PK · Auto-incremental Identificador único del juego
+titulo VARCHAR(150) NOT NULL Título del videojuego
+descripcion TEXT Opcional Sinopsis o descripción del juego
+fechalanzamiento DATE Opcional Fecha de lanzamiento oficial
+precio NUMERIC(10,2) Opcional Precio de venta en dólares
+calificacionprom NUMERIC(3,2) Opcional Calificación promedio calculada de las
+reseñas
+urlimagen TEXT Opcional URL de la imagen de portada
+idestudio INTEGER FK → estudio · NOT
+NULL
+Estudio que desarrolló el juego
+idgenero INTEGER FK → genero_juego ·
+NOT NULL
+Género al que pertenece el juego
+idplataforma INTEGER FK → plataforma · NOT
+NULL
+Plataforma principal del juego
+Tabla: usuario
+Almacena los usuarios registrados en la plataforma.
+Atributo Tipo Restricción Descripción
+idusuario INTEGER PK · Auto-incremental Identificador único del usuario
+nombre VARCHAR(100) NOT NULL Nombre visible del usuario en la
+plataforma
+correo VARCHAR(100) NOT NULL · UNIQUE Correo electrónico (usado para inicio de
+sesión)
+contrasenahash VARCHAR(255) NOT NULL Contraseña almacenada como hash
+(bcrypt)
+cantidadresenas INTEGER DEFAULT 0 Contador de reseñas publicadas por el
+usuario
+Tabla: resena
+Registra las reseñas publicadas por los usuarios sobre los juegos del catálogo.
+Atributo Tipo Restricción Descripción
+idresena INTEGER PK · Auto-incremental Identificador único de la reseña
+comentario TEXT Opcional Texto de la opinión del usuario
+puntuacion INTEGER NOT NULL · CHECK (1 –
+10)
+Puntuación numérica entre 1 y 10
+fecharesena DATE Opcional Fecha en que se publicó la reseña
+idusuario INTEGER FK → usuario · NOT
+NULL
+Usuario autor de la reseña
+idjuego INTEGER FK → juego · NOT NULL Juego que recibe la reseña
+5. Endpoints de la API REST
+La API está construida con Python / Flask y se conecta a PostgreSQL mediante Flask-SQLAlchemy. Se organiza en
+cuatro módulos (Blueprints).
+Juegos — /api/juegos
+Método Ruta Descripción
+GET /api/juegos Lista todos los juegos
+GET /api/juegos/{id} Detalle de un juego
+GET /api/juegos/buscar?titulo= Búsqueda por título
+GET /api/juegos/genero/{id} Filtrar por género
+GET /api/juegos/plataforma/{id} Filtrar por plataforma
+GET /api/juegos/estudio/{id} Filtrar por estudio
+GET /api/juegos/top Juegos ordenados por calificación
+POST /api/juegos Crear un nuevo juego
+PUT /api/juegos/{id} Actualizar un juego
+DELETE /api/juegos/{id} Eliminar un juego
+Reseñas — /api/resenas
+Método Ruta Descripción
+GET /api/resenas Lista todas las reseñas
+GET /api/resenas/{id} Detalle de una reseña
+GET /api/resenas/juego/{id} Reseñas de un juego
+GET /api/resenas/juego/{id}/recientes Reseñas de un juego (más
+recientes primero)
+GET /api/resenas/juego/{id}/top Reseñas de un juego (mejor
+puntuación primero)
+GET /api/resenas/usuario/{id} Reseñas de un usuario
+POST /api/resenas Publicar una reseña
+PUT /api/resenas/{id} Editar una reseña
+DELETE /api/resenas/{id} Eliminar una reseña
+Catálogo — /api/catalogo
+Método Ruta Descripción
+GET /api/catalogo/generos Lista géneros
+POST /api/catalogo/generos Crear género
+GET /api/catalogo/plataformas Lista plataformas
+POST /api/catalogo/plataformas Crear plataforma
+GET /api/catalogo/estudios Lista estudios
+POST /api/catalogo/estudios Crear estudio
+Usuarios — /api/usuarios
+Método Ruta Descripción
+GET /api/usuarios Lista todos los usuarios
+GET /api/usuarios/{id} Detalle de un usuario

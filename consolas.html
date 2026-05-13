@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Consolas - GameReview</title>
+    <link rel="stylesheet" href="styles.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        .plataforma-seccion { margin-bottom: 3rem; }
+        .plataforma-titulo {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: #c4b5fd;
+            border-left: 5px solid #4f46e5;
+            padding-left: 0.75rem;
+            margin-bottom: 1.25rem;
+        }
+        .juegos-plataforma {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 1.25rem;
+        }
+        .game-card {
+            position: relative;
+            border-radius: 10px;
+            overflow: hidden;
+            background: #1f1f3a;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+            transition: transform 0.3s;
+        }
+        .game-card:hover { transform: scale(1.04); }
+        .game-card img {
+            width: 100%;
+            height: 220px;
+            object-fit: cover;
+            display: block;
+        }
+        .game-card .info {
+            padding: 0.6rem 0.75rem;
+        }
+        .game-card .titulo {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: #e2e8f0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .game-card .rating-badge {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            background: #4f46e5;
+            color: #fff;
+            font-weight: 700;
+            font-size: 0.85rem;
+            padding: 0.2rem 0.5rem;
+            border-radius: 6px;
+        }
+        .sin-juegos { color: #6b7280; font-style: italic; padding: 1rem 0; }
+        .cargando { color: #9ca3af; padding: 1rem 0; }
+        .nav-right { display: flex; align-items: center; gap: 0.75rem; }
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <div class="nav-container">
+                <a href="index.html" class="logo">GameReview</a>
+                <ul class="nav-menu">
+                    <li><a href="index.html">Inicio</a></li>
+                    <li><a href="catalogo.html">Catálogo</a></li>
+                    <li><a href="resenas.html">Reseñas</a></li>
+                    <li><a href="consolas.html">Consolas</a></li>
+                </ul>
+                <div class="nav-right">
+                    <div id="nav-auth" style="display:flex;align-items:center;gap:0.75rem;"></div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main style="max-width:1200px;margin:2rem auto;padding:0 1rem;">
+        <h1 style="font-size:2rem;margin-bottom:2rem;color:#e2e8f0;">Juegos por Plataforma</h1>
+        <div id="contenedor-plataformas">
+            <p class="cargando">Cargando plataformas...</p>
+        </div>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-brand">
+                <h3 class="logo">GameReview</h3>
+                <p style="color:#9ca3af;">Tu portal gamer definitivo.</p>
+            </div>
+            <div class="footer-links">
+                <ul>
+                    <li>Sobre nosotros</li>
+                    <li>Contacto</li>
+                    <li>Términos</li>
+                </ul>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+    const API_BASE = 'http://localhost:8080';
+
+    // Plataformas que queremos mostrar (en ese orden)
+    const PLATAFORMAS_DESEADAS = ['PC', 'PlayStation 5', 'PlayStation 4', 'Nintendo Switch', 'Xbox Series X/S'];
+
+    function obtenerImagenFallback(titulo) {
+        const mapa = {
+            'Elden Ring': 'img/Eldenring.jpg',
+            'Baldur': 'img/baldurs.jpg',
+            'Cyberpunk': 'img/cyberpunk.jpg',
+            'Zelda': 'img/ZeldaTearsOfTheKingdom.jpg',
+            'Stardew': 'img/StardewValley.jpg',
+            'Helldivers': 'img/helldivers.jpg',
+            'Final Fantasy': 'img/ff16.jpg',
+            'Witcher': 'img/witcher.jpg',
+            'Sekiro': 'img/Juego.jpg',
+            'Divinity': 'img/rdr.jpg',
+        };
+        for (const [clave, url] of Object.entries(mapa)) {
+            if (titulo.includes(clave)) return url;
+        }
+        return `https://placehold.co/300x220/1f1f3a/4f46e5?text=${encodeURIComponent(titulo.substring(0,12))}`;
+    }
+
+    function renderJuego(juego) {
+        const calificacion = juego.calificacionProm != null ? Number(juego.calificacionProm).toFixed(1) : 'N/A';
+        const imagen = juego.urlImagen || juego.urlimagen || obtenerImagenFallback(juego.titulo);
+        return `
+            <div class="game-card">
+                <img src="${imagen}" alt="${juego.titulo}"
+                     onerror="this.src='${obtenerImagenFallback(juego.titulo)}'">
+                <span class="rating-badge">★ ${calificacion}</span>
+                <div class="info">
+                    <div class="titulo" title="${juego.titulo}">${juego.titulo}</div>
+                </div>
+            </div>
+        `;
+    }
+
+    async function cargarContenido() {
+        const contenedor = document.getElementById('contenedor-plataformas');
+        try {
+            const res = await fetch(`${API_BASE}/api/catalogo/plataformas`);
+            if (!res.ok) throw new Error(`Error ${res.status}`);
+            const plataformas = await res.json();
+
+            // Filtrar y ordenar según PLATAFORMAS_DESEADAS
+            const platFiltradas = PLATAFORMAS_DESEADAS
+                .map(nombre => plataformas.find(p => p.nombre === nombre))
+                .filter(Boolean);
+
+            if (platFiltradas.length === 0) {
+                contenedor.innerHTML = '<p style="color:#6b7280;">No se encontraron plataformas.</p>';
+                return;
+            }
+
+            contenedor.innerHTML = '';
+
+            for (const plat of platFiltradas) {
+                const seccion = document.createElement('section');
+                seccion.className = 'plataforma-seccion';
+                seccion.innerHTML = `
+                    <h2 class="plataforma-titulo">${plat.nombre}</h2>
+                    <div class="juegos-plataforma" id="plat-${plat.idPlataforma}">
+                        <p class="cargando">Cargando juegos...</p>
+                    </div>
+                `;
+                contenedor.appendChild(seccion);
+
+                // Cargar juegos de esta plataforma
+                fetch(`${API_BASE}/api/juegos/plataforma/${plat.idPlataforma}`)
+                    .then(r => r.ok ? r.json() : [])
+                    .then(juegos => {
+                        const grid = document.getElementById(`plat-${plat.idPlataforma}`);
+                        if (!juegos.length) {
+                            grid.innerHTML = '<p class="sin-juegos">Sin juegos registrados para esta plataforma.</p>';
+                        } else {
+                            grid.innerHTML = juegos.map(renderJuego).join('');
+                        }
+                    })
+                    .catch(() => {
+                        const grid = document.getElementById(`plat-${plat.idPlataforma}`);
+                        grid.innerHTML = '<p class="sin-juegos">Error al cargar juegos.</p>';
+                    });
+            }
+        } catch (e) {
+            contenedor.innerHTML = '<p style="color:#f87171;">Error de conexión con el servidor. Asegúrate de que el backend esté corriendo en el puerto 8080.</p>';
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', cargarContenido);
+    </script>
+    <script src="auth-nav.js"></script>
+</body>
+</html>

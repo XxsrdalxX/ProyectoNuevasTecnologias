@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\ml408\\\\Downloads\\\\mondongou\" -Recurse -Filter \"*.pdf\")",
+      "Bash(Select-Object FullName)",
+      "Bash(python3 *)",
+      "Bash(pip install *)",
+      "PowerShell(Set-Content *)"
+    ]
+  }
+}

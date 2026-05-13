@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GameReview - Inicio</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
+        body { font-family: 'Inter', sans-serif; background-color: #0d0e1b; color: #e2e8f0; }
+
+        .navbar { background-color: #1a1a2e; padding: 1rem 0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.2); }
+        .nav-container { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; padding: 0 1rem; }
+        .logo { font-size: 1.8rem; font-weight: bold; color: #9f7aea; text-decoration: none; }
+        .nav-menu { display: flex; list-style: none; margin: 0; padding: 0; }
+        .nav-menu li a { color: #e2e8f0; padding: 0.5rem 1rem; transition: color 0.3s; text-decoration: none; }
+        .nav-menu li a:hover { color: #9f7aea; }
+        .nav-right { display: flex; align-items: center; gap: 1rem; }
+
+        /* Hero */
+        .hero {
+            position: relative;
+            height: 420px;
+            border-radius: 1rem;
+            overflow: hidden;
+            margin-bottom: 3rem;
+            display: flex;
+            align-items: flex-end;
+        }
+        .hero-bg {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: brightness(0.4);
+        }
+        .hero-content {
+            position: relative;
+            padding: 2.5rem;
+            width: 100%;
+        }
+        .hero-content h1 { font-size: 2.5rem; font-weight: 800; color: #fff; margin: 0 0 0.5rem; }
+        .hero-content p { color: #d1d5db; max-width: 580px; margin-bottom: 1.25rem; line-height: 1.6; }
+        .hero-badge { display: inline-flex; align-items: center; gap: 0.4rem; background: #7c3aed; color: #fff; font-weight: 700; padding: 0.3rem 0.75rem; border-radius: 999px; font-size: 0.95rem; margin-bottom: 0.75rem; }
+        .btn-primary { background-color: #7c3aed; color: white; padding: 0.65rem 1.4rem; border-radius: 0.5rem; font-weight: 700; transition: background-color 0.2s; text-decoration: none; display: inline-block; border: none; cursor: pointer; font-family: inherit; font-size: 1rem; }
+        .btn-primary:hover { background-color: #6d28d9; }
+
+        /* Sección título */
+        .section-titulo {
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: #c4b5fd;
+            border-left: 5px solid #7c3aed;
+            padding-left: 0.75rem;
+            margin-bottom: 1.5rem;
+        }
+
+        /* Grid de juegos */
+        .catalog-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+            gap: 1.25rem;
+            margin-bottom: 1.5rem;
+        }
+        .game-card-idx {
+            background: #1a1a2e;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+            transition: transform 0.25s;
+            text-decoration: none;
+            display: block;
+        }
+        .game-card-idx:hover { transform: translateY(-4px); }
+        .game-card-idx img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            display: block;
+        }
+        .game-card-idx .card-info { padding: 0.75rem 0.9rem; }
+        .game-card-idx .card-title {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: #e2e8f0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-bottom: 0.3rem;
+        }
+        .game-card-idx .card-meta { display: flex; justify-content: space-between; align-items: center; }
+        .card-rating { background: #7c3aed; color: #fff; font-size: 0.78rem; font-weight: 700; padding: 0.15rem 0.45rem; border-radius: 6px; }
+        .card-genre { color: #9ca3af; font-size: 0.78rem; }
+
+        .ver-mas-wrap { text-align: center; margin: 1rem 0 3rem; }
+        .btn-outline { border: 2px solid #7c3aed; color: #c4b5fd; background: transparent; padding: 0.6rem 1.5rem; border-radius: 0.5rem; font-weight: 700; text-decoration: none; transition: background 0.2s; display: inline-block; }
+        .btn-outline:hover { background: #7c3aed; color: #fff; }
+
+        .cargando-idx { color: #6b7280; padding: 1rem 0; }
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <div class="nav-container">
+                <a href="index.html" class="logo">GameReview</a>
+                <ul class="nav-menu">
+                    <li><a href="index.html">Inicio</a></li>
+                    <li><a href="catalogo.html">Catálogo</a></li>
+                    <li><a href="consolas.html">Consolas</a></li>
+                    <li><a href="resenas.html">Reseñas</a></li>
+                </ul>
+                <div class="nav-right">
+                    <div id="nav-auth" style="display:flex;align-items:center;gap:0.75rem;"></div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container mx-auto p-4 md:p-8" style="max-width:1200px;">
+
+        <!-- Hero dinámico -->
+        <section class="hero mb-12" id="hero-section">
+            <img class="hero-bg" id="hero-img" src="" alt="">
+            <div class="hero-content">
+                <div class="hero-badge" id="hero-badge">★ —</div>
+                <h1 id="hero-titulo">Cargando...</h1>
+                <p id="hero-desc"></p>
+                <a href="catalogo.html" class="btn-primary" id="hero-btn">Ver catálogo</a>
+            </div>
+        </section>
+
+        <!-- Catálogo: juegos mejor calificados -->
+        <section class="mb-4">
+            <h2 class="section-titulo">Mejor Calificados</h2>
+            <div class="catalog-grid" id="grid-top">
+                <p class="cargando-idx">Cargando juegos...</p>
+            </div>
+            <div class="ver-mas-wrap">
+                <a href="catalogo.html" class="btn-outline">Ver catálogo completo →</a>
+            </div>
+        </section>
+
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-brand">
+                <h3 class="logo">GameReview</h3>
+                <p style="color:#9ca3af;">Comparte y descubre reseñas honestas.</p>
+            </div>
+            <div class="footer-links">
+                <ul>
+                    <li>Contacto</li>
+                    <li>Privacidad</li>
+                    <li>Soporte</li>
+                </ul>
+            </div>
+        </div>
+    </footer>
+
+    <script src="auth-nav.js"></script>
+    <script>
+    const API = 'http://localhost:8080';
+
+    function imagenFallback(titulo) {
+        const mapa = {
+            'Elden Ring': 'img/Eldenring.jpg',
+            'Baldur': 'img/baldurs.jpg',
+            'Cyberpunk': 'img/cyberpunk.jpg',
+            'Zelda': 'img/ZeldaTearsOfTheKingdom.jpg',
+            'Stardew': 'img/StardewValley.jpg',
+            'Helldivers': 'img/helldivers.jpg',
+            'Final Fantasy': 'img/ff16.jpg',
+            'Witcher': 'img/witcher.jpg',
+            'Sekiro': 'img/Juego.jpg',
+            'Divinity': 'img/rdr.jpg',
+        };
+        for (const [clave, url] of Object.entries(mapa)) {
+            if (titulo.includes(clave)) return url;
+        }
+        return `https://placehold.co/300x200/1f1f3a/7c3aed?text=${encodeURIComponent(titulo.substring(0,12))}`;
+    }
+
+    function renderCard(juego) {
+        const img = juego.urlImagen || juego.urlimagen || imagenFallback(juego.titulo);
+        const calif = juego.calificacionProm != null ? Number(juego.calificacionProm).toFixed(1) : 'N/A';
+        const genero = juego.genero?.nombre || '';
+        return `
+            <a href="juego.html?id=${juego.idJuego}" class="game-card-idx">
+                <img src="${img}" alt="${juego.titulo}"
+                     onerror="this.src='${imagenFallback(juego.titulo)}'">
+                <div class="card-info">
+                    <div class="card-title" title="${juego.titulo}">${juego.titulo}</div>
+                    <div class="card-meta">
+                        <span class="card-genre">${genero}</span>
+                        <span class="card-rating">★ ${calif}</span>
+                    </div>
+                </div>
+            </a>`;
+    }
+
+    async function cargar() {
+        try {
+            const res = await fetch(`${API}/api/juegos`);
+            if (!res.ok) throw new Error();
+            const juegos = await res.json();
+
+            const ordenados = juegos.sort((a, b) =>
+                (b.calificacionProm || 0) - (a.calificacionProm || 0)
+            );
+
+            // Hero: juego mejor calificado
+            const top = ordenados[0];
+            if (top) {
+                const img = top.urlImagen || top.urlimagen || imagenFallback(top.titulo);
+                const calif = top.calificacionProm != null ? Number(top.calificacionProm).toFixed(1) : 'N/A';
+                document.getElementById('hero-img').src = img;
+                document.getElementById('hero-img').alt = top.titulo;
+                document.getElementById('hero-badge').textContent = `★ ${calif}`;
+                document.getElementById('hero-titulo').textContent = top.titulo;
+                document.getElementById('hero-desc').textContent = top.descripcion || '';
+                document.getElementById('hero-btn').href = `juego.html?id=${top.idJuego}`;
+            }
+
+            // Grid: top 8
+            const grid = document.getElementById('grid-top');
+            const top8 = ordenados.slice(0, 8);
+            grid.innerHTML = top8.map(renderCard).join('');
+
+        } catch {
+            document.getElementById('hero-titulo').textContent = 'No se pudo conectar al servidor';
+            document.getElementById('grid-top').innerHTML =
+                '<p style="color:#f87171;">Error al cargar juegos. Verifica que el backend esté corriendo.</p>';
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', cargar);
+    </script>
+</body>
+</html>

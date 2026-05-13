@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar sesión - GameReviews</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #0d0e1b; color: #e2e8f0; }
+        .navbar { background-color: #1a1a2e; padding: 1rem 0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.2); }
+        .nav-container { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; padding: 0 1rem; }
+        .logo { font-size: 1.8rem; font-weight: bold; color: #9f7aea; text-decoration: none; }
+        .nav-menu { display: flex; list-style: none; margin: 0; padding: 0; }
+        .nav-menu li a { color: #e2e8f0; padding: 0.5rem 1rem; transition: color 0.3s; text-decoration: none; }
+        .nav-menu li a:hover { color: #9f7aea; }
+        .register-btn { background-color: #9f7aea; color: white; padding: 0.5rem 1rem; border-radius: 0.5rem; font-weight: bold; text-decoration: none; }
+        .card { background: #1f1f3a; border-radius: 12px; padding: 2rem; max-width: 440px; margin: 4rem auto; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
+        .card h2 { margin: 0 0 0.5rem; color: #e2e8f0; font-size: 1.5rem; }
+        .card p { color: #9ca3af; margin: 0 0 1.5rem; }
+        .field { display: grid; gap: 0.4rem; margin-bottom: 1rem; }
+        .field label { color: #c4b5fd; font-size: 0.9rem; font-weight: 600; }
+        .field input { padding: 0.65rem 0.75rem; border-radius: 0.5rem; border: 1px solid #3f3d56; background: #2b2c49; color: #e2e8f0; font-size: 1rem; }
+        .field input:focus { outline: none; border-color: #9f7aea; }
+        .btn-primary { width: 100%; padding: 0.75rem; background: #9f7aea; color: #fff; border: none; border-radius: 0.5rem; font-size: 1rem; font-weight: 700; cursor: pointer; margin-top: 0.5rem; transition: background 0.2s; }
+        .btn-primary:hover { background: #805ad5; }
+        .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
+        .msg { min-height: 1.4rem; font-weight: 600; margin-top: 0.75rem; font-size: 0.9rem; }
+        .link-row { text-align: center; margin-top: 1.25rem; color: #9ca3af; font-size: 0.9rem; }
+        .link-row a { color: #9f7aea; text-decoration: none; }
+        .link-row a:hover { text-decoration: underline; }
+        .rol-badge { display: inline-block; padding: 0.2rem 0.6rem; border-radius: 99px; font-size: 0.75rem; font-weight: 700; }
+        .rol-admin { background: #7c3aed; color: #fff; }
+        .rol-cliente { background: #1e3a5f; color: #93c5fd; }
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <div class="nav-container">
+                <a href="index.html" class="logo">GameReview</a>
+                <ul class="nav-menu">
+                    <li><a href="catalogo.html">Juegos</a></li>
+                    <li><a href="resenas.html">Reseñas</a></li>
+                </ul>
+                <div>
+                    <a href="registro.html" class="register-btn">Registrarse</a>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <div class="card">
+            <h2>Iniciar sesión</h2>
+            <p>Accede a tu cuenta para publicar reseñas.</p>
+
+            <form id="loginForm">
+                <div class="field">
+                    <label for="correo">Correo electrónico</label>
+                    <input id="correo" type="email" placeholder="usuario@ejemplo.com" required>
+                </div>
+                <div class="field">
+                    <label for="contrasena">Contraseña</label>
+                    <input id="contrasena" type="password" placeholder="********" required>
+                </div>
+                <button type="submit" class="btn-primary" id="loginBtn">Ingresar</button>
+                <div id="msg" class="msg"></div>
+            </form>
+
+            <div class="link-row">
+                ¿No tienes cuenta? <a href="registro.html">Regístrate aquí</a>
+            </div>
+        </div>
+    </main>
+
+    <script>
+    const API_BASE = 'http://localhost:8080';
+
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const msg = document.getElementById('msg');
+        const btn = document.getElementById('loginBtn');
+        msg.textContent = '';
+        btn.disabled = true;
+        btn.textContent = 'Ingresando...';
+
+        try {
+            const res = await fetch(`${API_BASE}/api/auth/login`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    correo: document.getElementById('correo').value.trim(),
+                    contrasena: document.getElementById('contrasena').value
+                })
+            });
+
+            const data = await res.json();
+
+            if (res.ok) {
+                localStorage.setItem('gr_token', data.token);
+                localStorage.setItem('gr_user', JSON.stringify(data.usuario));
+                msg.style.color = '#34d399';
+                msg.textContent = `Bienvenido, ${data.usuario.nombre}. Redirigiendo...`;
+                setTimeout(() => window.location.href = 'index.html', 1200);
+            } else {
+                msg.style.color = '#f87171';
+                msg.textContent = data.error || 'Credenciales inválidas';
+                btn.disabled = false;
+                btn.textContent = 'Ingresar';
+            }
+        } catch (e) {
+            msg.style.color = '#f87171';
+            msg.textContent = 'Error de conexión con el servidor.';
+            btn.disabled = false;
+            btn.textContent = 'Ingresar';
+        }
+    });
+    </script>
+</body>
+</html>
